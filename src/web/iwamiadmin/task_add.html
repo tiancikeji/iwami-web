@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <link rel="stylesheet" type="text/css" href="static/datepick/lhgcalendar.css" />
+    <title>新建任务|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <style>
+        .form-group{
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <!--#include virtual="/iwamiadmin/header.html"-->
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse">
+            <form class="form-horizontal j_common_form j_common_form_autosubmit" role="search" id="postForm"
+                  data-edit-url="/client/MOD/task.ajax"
+                  data-add-url="/client/ADD/task.ajax"
+                  data-back-url="task_list.html">
+                <input type="hidden" name="taskid" class="j_common_form_autovalue" />
+                <input type="hidden" name="rank" value="0" class="j_common_form_autovalue" />
+                <input type="hidden" name="currentPrize" value="0" class="j_common_form_autovalue" />
+                <input type="hidden" name="isdel" value="0" class="j_common_form_autovalue" />
+                <input type="hidden" name="addCurrentPrize" value="0" class="" />
+                <div class="form-group iwami-input-group">
+                    任务名称：
+                    <input name="name" type="text" class="form-control input-inline j_common_form_autovalue" size="70">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    任务类型：
+                    <select name="type" class="form-control input-inline j_common_form_autovalue">
+                        <option value="1">普通任务</option>
+                        <option value="3">金榜任务</option>
+                        <option value="2">红包任务</option>
+                        <option value="5">线下任务</option>
+                    </select>&nbsp;&nbsp;
+                    任务属性：
+                    <select name="attr" class="form-control input-inline j_common_form_autovalue">
+                        <option value="1">后台激活</option>
+                        <option value="2">前台激活</option>
+                        <option value="3">注册</option>
+                        <option value="4">分享</option>
+                    </select>&nbsp;&nbsp;
+                    任务要求时间：
+                    <input name="time" type="text" class="form-control input-inline j_common_form_autovalue" size="10">
+                    S
+
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    开始时间：
+                    <input name="startTime" type="text" class="form-control input-inline j_date  j_common_form_autovalue" size="20">
+
+                    结束时间：
+                    <input name="endTime" type="text" class="form-control input-inline j_date  j_common_form_autovalue" size="20">
+
+                    任务限额：
+                    <input name="maxPrize" type="text" class="form-control input-inline  j_common_form_autovalue" placeholder="" size="10">
+
+                    任务米粒数：
+                    <input name="prize" type="text" class="form-control input-inline  j_common_form_autovalue" placeholder="" size="10">
+
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    app介绍：
+                    <input name="appintr" type="text" class="form-control input-inline  j_common_form_autovalue" placeholder="" size="100">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    任务介绍：
+                    <input name="intr" type="text" class="form-control input-inline  j_common_form_autovalue" placeholder="" size="100">
+                    （对于分享任务，此处内容显示在分享标题处）
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    app下载地址：
+                    <input name="url" type="text" class="form-control input-inline  j_common_form_autovalue" placeholder="" size="100" value="http://apk.iwami.cn/">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    apk包名：
+                    <input name="packageName" type="text" class="form-control input-inline  j_common_form_autovalue" placeholder="" size="100">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    app小图：
+                    <input name="iconSmall" type="text" class="form-control input-inline  j_common_form_autovalue" placeholder="" size="100" value="http://apk.iwami.cn/">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    app大图：
+                    <input name="iconBig" type="text" class="form-control input-inline  j_common_form_autovalue" placeholder="" size="100" value="http://apk.iwami.cn/">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    <input   id="defaultInput" type="checkbox" name="default" value="1" class="j_common_form_autovalue" data-checked-vaue="1" />
+                    <label for="defaultInput">设置为榜单默认显示app（仅针对金榜任务）</label>
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    <button type="cancel" class="btn btn-default">取消</button>
+                    <button type="submit" class="btn btn-default">确定</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive" id="list"></div>
+    <!--#include virtual="/iwamiadmin/footer.html"-->
+    <!--#include virtual="/iwamiadmin/static/inc/upload.js.html"-->
+
+    <script src="static/datepick/lhgcore.lhgcalendar.min.js"></script>
+    <script>
+        (function(){
+            $.Iwami.selectNav('.j_nav_task');
+            //日期控件 yyyy-MM-dd HH:mm:ss
+            $('.j_date').calendar({ format:'yyyy-MM-dd HH:mm:ss' });
+
+            var $postForm = $('#postForm');
+
+            if($.Iwami.form.isEditMode()){
+                //当前米粒数改为新增米粒数
+               /* $('<div class="form-group iwami-input-group">' +
+                        '新增米粒数：' +
+                        '<input name="addCurrentPrize" type="text" class="form-control input-inline" size="10" value="0">' +
+                        '</div>').prependTo($postForm);*/
+                $('input[name="currentPrize"]').remove();
+            }
+            /*
+            $postForm.submit(function(e){
+                e.preventDefault();
+
+                if($.Iwami.form.isEditMode()){
+
+
+                    $.post($.Iwami.rootUri + '/client/MOD/task.ajax?adminid=' + $.Iwami.login.getUserId(),
+                            $postForm.serialize(), function(res){
+                                if($.Iwami.ajax.validRes(res)){ //验证通过
+                                    if(res.status != 0){
+                                        $.Iwami.showTip('操作失败，请稍后再试', 2000, 'warning');
+                                    }else{
+                                        $.Iwami.showTip('操作成功！', 2000, 'success');
+                                    }
+                                }
+                            }, 'json');
+                }else{
+                    $.post($.Iwami.rootUri + '/client/ADD/task.ajax?adminid=' + $.Iwami.login.getUserId(),
+                            $postForm.serialize(), function(res){
+                                if($.Iwami.ajax.validRes(res)){ //验证通过
+                                    if(res.status != 0){
+                                        $.Iwami.showTip('操作失败，请稍后再试', 2000, 'warning');
+                                    }else{
+                                        $.Iwami.showTip('操作成功！', 2000, 'success');
+                                    }
+                                }
+                            }, 'json');
+                }
+            });
+            */
+        })();
+    </script>
+</body>
+</html>

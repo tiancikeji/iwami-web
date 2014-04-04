@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <link rel="stylesheet" type="text/css" href="static/datepick/lhgcalendar.css" />
+    <title>用户管理|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+</head>
+<body>
+    <!--#include virtual="/iwamiadmin/header.html"-->
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse">
+            <form class="form-horizontal j_common_form j_common_form_autosubmit" role="search" id="postForm"
+                  data-edit-url="/client/MOD/user.ajax"
+                  data-back-url="user_manage.html">
+                <input type="hidden" name="userid" class="j_common_form_autovalue" />
+                <input type="hidden" name="cellPhone" class="j_common_form_autovalue" />
+                <input type="hidden" name="age" class="j_common_form_autovalue" />
+                <input type="hidden" name="gender" class="j_common_form_autovalue" />
+                <input type="hidden" name="job" class="j_common_form_autovalue" />
+                <input type="hidden" name="address" class="j_common_form_autovalue" />
+                <input type="hidden" name="isdel" class="j_common_form_autovalue" />
+                <input type="hidden" name="currentPrize" class="j_common_form_autovalue" />
+                <input type="hidden" name="exchangePrize" class="j_common_form_autovalue" />
+                <input type="hidden" name="lastCellPhone1" class="j_common_form_autovalue" />
+                <input type="hidden" name="lastBankAccount" class="j_common_form_autovalue" />
+                <input type="hidden" name="lastCellPhone2" class="j_common_form_autovalue" />
+                <input type="hidden" name="lastName" class="j_common_form_autovalue" />
+
+                <div class="form-group iwami-input-group">
+                    姓名：
+                    <input name="username" type="text" class="form-control input-inline j_common_form_autovalue" size="70">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    奖品地址：
+                    <input name="lastAddress" type="text" class="form-control input-inline j_common_form_autovalue" size="70">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    开户银行：
+                    <input name="lastBankName" type="text" class="form-control input-inline j_common_form_autovalue" size="70">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    银行卡账号：
+                    <input name="lastBankNo" type="text" class="form-control input-inline j_common_form_autovalue" size="70">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    支付宝账号：
+                    <input name="lastAlipayAccount" type="text" class="form-control input-inline j_common_form_autovalue" size="70">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    <button type="cancel" class="btn btn-default">取消</button>
+                    <button type="submit" class="btn btn-default">确定</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive" id="list"></div>
+    <!--#include virtual="/iwamiadmin/footer.html"-->
+    <!--#include virtual="/iwamiadmin/static/inc/upload.js.html"-->
+
+    <script src="static/datepick/lhgcore.lhgcalendar.min.js"></script>
+    <script>
+        (function(){
+            $.Iwami.selectNav('.j_nav_usermanage');
+
+            /*
+            $postForm.submit(function(e){
+                e.preventDefault();
+
+                if($.Iwami.form.isEditMode()){
+
+
+                    $.post($.Iwami.rootUri + '/client/MOD/task.ajax?adminid=' + $.Iwami.login.getUserId(),
+                            $postForm.serialize(), function(res){
+                                if($.Iwami.ajax.validRes(res)){ //验证通过
+                                    if(res.status != 0){
+                                        $.Iwami.showTip('操作失败，请稍后再试', 2000, 'warning');
+                                    }else{
+                                        $.Iwami.showTip('操作成功！', 2000, 'success');
+                                    }
+                                }
+                            }, 'json');
+                }else{
+                    $.post($.Iwami.rootUri + '/client/ADD/task.ajax?adminid=' + $.Iwami.login.getUserId(),
+                            $postForm.serialize(), function(res){
+                                if($.Iwami.ajax.validRes(res)){ //验证通过
+                                    if(res.status != 0){
+                                        $.Iwami.showTip('操作失败，请稍后再试', 2000, 'warning');
+                                    }else{
+                                        $.Iwami.showTip('操作成功！', 2000, 'success');
+                                    }
+                                }
+                            }, 'json');
+                }
+            });
+            */
+        })();
+    </script>
+</body>
+</html>

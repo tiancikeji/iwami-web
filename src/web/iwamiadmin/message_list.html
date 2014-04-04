@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <title>任务管理|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+</head>
+<body>
+<!--#include virtual="/iwamiadmin/header.html"-->
+
+<div class="navbar navbar-default" role="navigation">
+    <div class="collapse navbar-collapse">
+        <form class="form-horizontal" role="search" id="postForm">
+            <div class="form-group iwami-input-group">
+                消息内容：
+                <input name="msg" type="text" class="form-control input-inline" placeholder="" size="100">
+            </div>
+            <div class="form-group iwami-input-group">
+                <label>
+                    <input type="radio" name="pushtype" value="1" checked />
+                    推送全部
+                </label>
+                &nbsp;&nbsp;
+                <label>
+                    <input type="radio" name="pushtype" value="2" />
+                    推送名单中用户
+                    <div class="iwami-up-ctn j_upload_ctn">
+                        <div class="iwami-up-btn j_upload_btn"></div>
+                        <div class="progress progress-striped active" style="display: none;">
+                            <div class="progress-bar"  role="progressbar" style="width: 1%">
+                                <span class="sr-only">1% Complete</span>
+                            </div>
+                        </div>
+                        <div class="j_upload_result"></div>
+                        <input name="file2" type="hidden" class="j_common_form_autovalue j_common_form_file" />
+                    </div>
+                </label>
+                &nbsp;&nbsp;
+                <label>
+                    <input type="radio" name="pushtype" value="3" />
+                    推送名单外用户
+                    <div class="iwami-up-ctn j_upload_ctn">
+                        <div class="iwami-up-btn j_upload_btn"></div>
+                        <div class="progress progress-striped active" style="display: none;">
+                            <div class="progress-bar"  role="progressbar" style="width: 1%">
+                                <span class="sr-only">1% Complete</span>
+                            </div>
+                        </div>
+                        <div class="j_upload_result"></div>
+                        <input name="file3" type="hidden" class="j_common_form_autovalue j_common_form_file" />
+                    </div>
+                </label>
+
+                &nbsp;&nbsp;
+                推送间隔：
+                <input name="interval" type="text" class="form-control input-inline" placeholder="" size="10">
+                秒
+
+                &nbsp;&nbsp;
+                <button type="submit" class="btn btn-default">开始推送</button>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive" id="list"></div>
+<!--#include virtual="/iwamiadmin/footer.html"-->
+
+<script id="listTmpl" type="text/html">
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>推送开始时间</th>
+            <th>预计结束时间</th>
+            <th>推送间隔</th>
+            <th>共推送</th>
+            <th>已推送成功</th>
+            <th>已推送失败</th>
+            <th>推送内容</th>
+            <th>推送状态</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%for(i = 0; i < data.length; i++){%>
+        <%var item = data[i]%>
+        <tr data-id="<%=item.id%>">
+            <th><%=item.addTime%></th>
+            <th><%=item.estimateTime%></th>
+            <th><%=item.interval%></th>
+            <th><%=item.allCnt%></th>
+            <th><%=item.succCnt%></th>
+            <th><%=item.failCnt%></th>
+            <th><%=item.msg%></th>
+            <th><%=['新建','暂停','停止','恢复','推送成功','短信发送成功'][item.status]%></th>
+            <th>
+                    <a href="#" class="j_btn_pause j_btn_op">
+                        暂停
+                    </a>
+                    <a href="#" class="j_btn_continue j_btn_op">
+                        继续
+                    </a>
+                    <a href="#" class="j_btn_stop j_btn_op">
+                        停止
+                    </a>
+            </th>
+        </tr>
+        <%}%>
+        </tbody>
+    </table>
+</script>
+
+<!--#include virtual="/iwamiadmin/static/inc/upload.js.html"-->
+
+<script>
+    (function(){
+        $.Iwami.selectNav('.j_nav_message');
+        //日期控件 yyyy-MM-dd HH:mm:ss
+
+        //任务查询
+        function loadList(){
+            $.get($.Iwami.rootUri + '/client/PUSH/list.ajax?adminid=' + $.Iwami.login.getUserId(), function(res){
+                        if($.Iwami.ajax.validRes(res)){ //验证通过
+                            $('#list').html(baidu.template('listTmpl', res));
+                        }
+                    }, 'json');
+        }
+        loadList();
+
+        var $postForm = $('#postForm');
+
+        var postForm = $postForm[0];
+
+        $postForm.submit(function(e){
+            e.preventDefault();
+            var pushType = '1';
+            var pushUrl = 'PUSH/all.ajax';
+            $postForm.find('input[name="pushtype"]').each(function(i, o){
+                if(this.checked){
+                    pushType = this.value;
+                }
+            });
+            var postObj = {
+                adminid: $.Iwami.login.getUserId(),
+                msg: postForm.msg.value,
+                interval: postForm.interval.value
+            }
+            if(pushType == '2'){
+                postObj.file = postForm.file2.value;
+                pushUrl = 'PUSH/white.ajax';
+            }else if(pushType == '3'){
+                postObj.file = postForm.file3.value;
+                pushUrl = 'PUSH/black.ajax';
+            }
+
+            $.post($.Iwami.rootUri + '/client/' + pushUrl, postObj, function(res){
+                if($.Iwami.ajax.validRes(res)){ //验证通过
+                    if(res.status != 0){
+                        $.Iwami.showTip('推送失败，请稍后再试', 2000, 'warning');
+                    }else{
+                        $.Iwami.showTip('推送成功！', 2000, 'success');
+                    }
+                }
+            }, 'json');
+            loadList();
+        });
+
+
+        $('#list').delegate('.j_btn_pause', 'click', function(e){//暂停
+            e.preventDefault();
+            var $target = $(this);
+            if(!confirm('你确认暂停此任务吗？')){
+                return false;
+            }
+            var $parentTr = $target.closest('tr');
+            $.post($.Iwami.rootUri + '/client/PUSH/pause.ajax', {
+                adminid: $.Iwami.login.getUserId(),
+                id: $parentTr.attr('data-id')
+            }, function(res){
+                if($.Iwami.ajax.validRes(res)){ //验证通过
+                    if(res.status != 0){
+                        $.Iwami.showTip('暂停失败，请稍后再试', 2000, 'warning');
+                    }else{
+                        $.Iwami.showTip('暂停成功！', 2000, 'success');
+                    }
+                }
+            }, 'json');
+
+        }).delegate('.j_btn_continue', 'click', function(e){
+                e.preventDefault();
+                var $target = $(this);
+                if(!confirm('你确认继续此任务吗？')){
+                    return false;
+                }
+                var $parentTr = $target.closest('tr');
+                $.post($.Iwami.rootUri + '/client/PUSH/continue.ajax', {
+                    adminid: $.Iwami.login.getUserId(),
+                    id: $parentTr.attr('data-id')
+                }, function(res){
+                    if($.Iwami.ajax.validRes(res)){ //验证通过
+                        if(res.status != 0){
+                            $.Iwami.showTip('继续失败，请稍后再试', 2000, 'warning');
+                        }else{
+                            $.Iwami.showTip('继续成功！', 2000, 'success');
+                            //$parentTr.remove();
+                        }
+                    }
+                }, 'json');
+
+            }).delegate('.j_btn_stop', 'click', function(e){
+                e.preventDefault();
+                var $target = $(this);
+                if(!confirm('你确认停止此任务吗？')){
+                    return false;
+                }
+                var $parentTr = $target.closest('tr');
+                $.post($.Iwami.rootUri + '/client/PUSH/stop.ajax', {
+                    adminid: $.Iwami.login.getUserId(),
+                    id: $parentTr.attr('data-id')
+                }, function(res){
+                    if($.Iwami.ajax.validRes(res)){ //验证通过
+                        if(res.status != 0){
+                            $.Iwami.showTip('停止失败，请稍后再试', 2000, 'warning');
+                        }else{
+                            $.Iwami.showTip('停止成功！', 2000, 'success');
+                            //$parentTr.remove();
+                        }
+                    }
+                }, 'json');
+
+            });
+
+    })();
+
+</script>
+</body>
+</html>

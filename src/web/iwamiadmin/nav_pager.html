@@ -1,0 +1,12 @@
+<div class="pager">
+    共<%=Math.ceil(count/$.Iwami.listManager.step)%>页 &nbsp;
+    &nbsp;第<%=Math.ceil($.Iwami.listManager.start/$.Iwami.listManager.step) + 1%>页&nbsp;
+    <%if(Math.ceil($.Iwami.listManager.start/$.Iwami.listManager.step) > 0){%>
+    <a href="#" class="j_btn_page" data-page="1">首页</a>&nbsp;
+    <a href="#" class="j_btn_page" data-page="<%=Math.ceil($.Iwami.listManager.start/$.Iwami.listManager.step)%>">上一页</a>&nbsp;
+    <%}%>
+    <%if(Math.ceil($.Iwami.listManager.start/$.Iwami.listManager.step) + 1 < Math.ceil(count/$.Iwami.listManager.step)){%>
+    <a href="#" class="j_btn_page" data-page="<%=Math.ceil($.Iwami.listManager.start/$.Iwami.listManager.step) + 2%>">下一页</a>&nbsp;
+    <a href="#" class="j_btn_page" data-page="<%=Math.ceil(count/$.Iwami.listManager.step)%>">尾页</a>
+    <%}%>
+</div>

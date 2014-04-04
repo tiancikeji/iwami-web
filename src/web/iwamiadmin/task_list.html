@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <title>任务管理|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+</head>
+<body>
+<!--#include virtual="/iwamiadmin/header.html"-->
+
+<div class="navbar navbar-default" role="navigation">
+    <div class="collapse navbar-collapse">
+        <form class="form-horizontal" role="search" id="postForm">
+            <div class="form-group iwami-input-group">
+                任务类型：
+                <select name="type" class="form-control input-inline">
+                    <option value="0">全部</option>
+                    <option value="1">普通任务</option>
+                    <option value="3">金榜任务</option>
+                    <option value="2">红包任务</option>
+                    <option value="4">分享任务</option>
+                    <option value="5">线下任务</option>
+                </select>&nbsp;&nbsp;
+                任务属性：
+                <select name="attr" class="form-control input-inline">
+                    <option value="0">全部</option>
+                    <option value="1">后台激活</option>
+                    <option value="2">前台激活</option>
+                    <option value="3">注册</option>
+                    <option value="4">分享</option>
+                </select>&nbsp;&nbsp;
+                任务状态：
+                <select name="status" class="form-control input-inline">
+                    <option value="0">全部</option>
+                    <option value="1">未开始</option>
+                    <option value="2">进行中</option>
+                    <option value="3">已结束</option>
+                </select>&nbsp;&nbsp;
+                剩余数量：
+                <input name="leftL" type="text" class="form-control input-inline" placeholder="" size="10">
+                -
+                <input name="leftR" type="text" class="form-control input-inline" placeholder="" size="10">
+
+                <button type="submit" class="btn btn-default">搜索</button>
+
+                &nbsp;<span class="j_totalnum"></span>
+            </div>
+            <div class="form-group iwami-input-group">
+                开始时间：
+                <input name="startL" type="text" class="form-control input-inline j_date" size="20">
+                -
+                <input name="startR" type="text" class="form-control input-inline j_date" size="20">
+
+                结束时间：
+                <input name="endL" type="text" class="form-control input-inline j_date" size="20">
+                -
+                <input name="endR" type="text" class="form-control input-inline j_date" size="20">
+
+            </div>
+
+            <div class="form-group iwami-input-group">
+
+                任务限额：
+                <input name="maxL" type="text" class="form-control input-inline" placeholder="" size="10">
+                -
+                <input name="maxR" type="text" class="form-control input-inline" placeholder="" size="10">
+
+
+                任务米粒数：
+                <input name="prizeL" type="text" class="form-control input-inline" placeholder="" size="10">
+                -
+                <input name="prizeR" type="text" class="form-control input-inline" placeholder="" size="10">
+
+
+                已抢数量：
+                <input name="currL" type="text" class="form-control input-inline" placeholder="" size="10">
+                -
+                <input name="currR" type="text" class="form-control input-inline" placeholder="" size="10">
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive" id="list"></div>
+<!--#include virtual="/iwamiadmin/footer.html"-->
+
+<script id="listTmpl" type="text/html">
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>操作</th>
+            <th>ID</th>
+            <th>名称</th>
+            <th>类型</th>
+            <th>属性</th>
+            <th><div style="width:7em;">开始时间</div></th>
+            <th><div style="width:7em;">结束时间</div></th>
+            <th>限额</th>
+            <th>已抢数量</th>
+            <th>剩余数量</th>
+            <th>要求时间</th>
+            <th>米粒数</th>
+            <th><div style="width:8em;">介绍</div></th>
+            <th><div style="width:8em;">app介绍</div></th>
+            <th>APP包名</th>
+            <th>app小图</th>
+            <th>app大图</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <%for(i = 0; i < data.length; i++){%>
+        <%var item = data[i]%>
+
+        <tr data-taskid="<%=item.taskid%>">
+            <td class="iwami-list-op">
+                <a href="task_add.html?form_edit_mode=1<%for(var name in item){%>&form_<%=name%>=<%:u=item[name]%><%}%>"
+                   target="_blank">
+                    编辑
+                </a>
+                <%if(item.isdel == 0){%>
+                <a href="#" class="j_btn_stop j_btn_op">
+                    停止
+                </a>
+                <%}%>
+                <a href="#" class="j_btn_del j_btn_op">
+                    删除
+                </a>
+            </td>
+            <td><%=item.taskid%></td>
+            <td><%=item.name%></td>
+            <td><%=['','普通','红包','金榜','分享','线下'][item.type]%></td>
+            <td><%=['','后台','前台','注册','分享'][item.attr]%></td>
+            <td><%=item.startTime%></td>
+            <td><%=item.endTime%></td>
+            <td class="text-right"><%=item.maxPrize%></td>
+            <td class="text-right"><%=item.currentPrize%></td>
+            <td class="text-right"><%=item.leftPrize%></td>
+            <td class="text-right"><%=item.time%></td>
+            <td class="text-right"><%=item.prize%></td>
+            <td><div style="width:10em;word-break: break-all;"><%=item.intr%></div></td>
+            <td><div style="width:10em;word-break: break-all;"><%=item.appintr%></div></td>
+            <td><a href="<%=item.url%>" target="_blank"><%=item.packageName%>&nbsp;</a></td>
+            <td><a href="<%=item.iconSmall%>" target="_blank">查看图片</a></td>
+            <td><a href="<%=item.iconBig%>" target="_blank">查看图片</a></td>
+
+        </tr>
+        <%}%>
+        </tbody>
+    </table>
+    <!--#include virtual="/iwamiadmin/nav_pager.html"-->
+</script>
+
+
+<script src="static/datepick/lhgcore.lhgcalendar.min.js"></script>
+<script>
+    (function(){
+        $.Iwami.selectNav('.j_nav_task');
+        //日期控件 yyyy-MM-dd HH:mm:ss
+        $('.j_date').calendar({ format:'yyyy-MM-dd HH:mm:ss' });
+
+
+        var $postForm = $('#postForm');
+
+        $postForm.submit(function(e){
+            e.preventDefault();
+            $.Iwami.listManager.init($('#list'), 20, function(){
+                $.get($.Iwami.rootUri + '/client/GET/task.ajax?adminid=' + $.Iwami.login.getUserId() +
+                        '&start='+ this.start +'&step='+ this.step,
+                        $postForm.serialize(), function(res){
+                            if($.Iwami.ajax.validRes(res)){ //验证通过
+                                $('#list').html(baidu.template('listTmpl', res));
+                                $('.j_totalnum').html('共' + res.data.length +'条');
+                            }
+                        }, 'json');
+            });
+        });
+
+        //删除
+        $('#list').delegate('.j_btn_del', 'click', function(e){
+            e.preventDefault();
+            var $target = $(this);
+            if(!confirm('你确认删除此任务吗？')){
+                return false;
+            }
+            var $parentTr = $target.closest('tr');
+            $.post($.Iwami.rootUri + '/client/DEL/task.ajax', {
+                adminid: $.Iwami.login.getUserId(),
+                taskid: $parentTr.attr('data-taskid')
+            }, function(res){
+                if($.Iwami.ajax.validRes(res)){ //验证通过
+                    if(res.status != 0){
+                        $.Iwami.showTip('删除失败，请稍后再试', 2000, 'warning');
+                    }else{
+                        $.Iwami.showTip('删除成功！', 2000, 'success');
+                        $parentTr.remove();
+                    }
+                }
+            }, 'json');
+
+        }).delegate('.j_btn_stop', 'click', function(e){
+                    e.preventDefault();
+                    var $target = $(this);
+                    if(!confirm('你确认停止此任务吗？')){
+                        return false;
+                    }
+                    var $parentTr = $target.closest('tr');
+                    $.post($.Iwami.rootUri + '/client/STOP/task.ajax', {
+                        adminid: $.Iwami.login.getUserId(),
+                        taskid: $parentTr.attr('data-taskid')
+                    }, function(res){
+                        if($.Iwami.ajax.validRes(res)){ //验证通过
+                            if(res.status != 0){
+                                $.Iwami.showTip('停止失败，请稍后再试', 2000, 'warning');
+                            }else{
+                                $.Iwami.showTip('停止成功！', 2000, 'success');
+                                //$parentTr.remove();
+                            }
+                        }
+                    }, 'json');
+
+                });
+
+    })();
+
+</script>
+<script>
+
+</script>
+</body>
+</html>

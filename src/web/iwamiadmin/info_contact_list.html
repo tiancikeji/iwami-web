@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <title>信息编辑-联系方式|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+</head>
+<body>
+    <!--#include virtual="/iwamiadmin/header.html"-->
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse">
+            <form class="form-horizontal j_common_form j_common_form_autosubmit" role="search" id="postForm"
+                  data-add-url="/client/MOD/contact.ajax"
+                  data-edit-url="/client/MOD/contact.ajax">
+                <input type="hidden" name="lastModTime" class="" />
+                <input type="hidden" name="lastModUserid" class="" />
+                <div class="form-group iwami-input-group">
+                    客服电话：
+                    <input name="phone1" type="text" class="form-control input-inline j_common_form_autovalue" size="120">
+                </div>
+                <div class="form-group iwami-input-group">
+                    服务邮箱：
+                    <input name="email1" type="text" class="form-control input-inline j_common_form_autovalue" size="120">
+                </div>
+                <div class="form-group iwami-input-group">
+                    官网地址：
+                    <input name="domain" type="text" class="form-control input-inline j_common_form_autovalue" size="120">
+                </div>
+                <div class="form-group iwami-input-group">
+                    客服QQ：
+                    <input name="qq" type="text" class="form-control input-inline j_common_form_autovalue" size="120">
+                </div>
+                <div class="form-group iwami-input-group">
+                    QQ群：
+                    <textarea name="qqgroup" cols="130" rows="3"></textarea>
+                </div>
+                <div class="form-group iwami-input-group">
+                    业务电话：
+                    <input name="phone2" type="text" class="form-control input-inline j_common_form_autovalue" size="120">
+                </div>
+                <div class="form-group iwami-input-group">
+                    业务邮箱：
+                    <input name="email2" type="text" class="form-control input-inline j_common_form_autovalue" size="120">
+                </div>
+
+
+                <div class="form-group iwami-input-group">
+                    <button type="cancel" class="btn btn-default">取消</button>
+                    <button type="submit" class="btn btn-default" id="btnSubmit">确定</button>
+                </div>
+            </form>
+
+
+        </div>
+    </div>
+
+    <div class="table-responsive" id="list"></div>
+    <!--#include virtual="/iwamiadmin/footer.html"-->
+    <!--#include virtual="/iwamiadmin/static/inc/upload.js.html"-->
+
+    <script>
+        (function(){
+            $.Iwami.selectNav('.j_nav_info');
+
+            var $postForm = $('#postForm');
+            var postForm = $postForm[0];
+            $.get($.Iwami.rootUri + '/client/GET/contact.ajax?adminid=' + $.Iwami.login.getUserId(), function(res){
+                        if($.Iwami.ajax.validRes(res)){ //验证通过
+                            if(res.status != 0){
+                                $.Iwami.showTip('获取信息失败', 2000, 'warning');
+                            }else{
+                                var data = res.data;
+                                for(var i = 0; i < postForm.elements.length; i++){
+                                    var ele = postForm.elements[i];
+                                    ele.value = data[ele.name] || '';
+                                }
+                            }
+                        }
+                    }, 'json');
+
+        })();
+
+    </script>
+    <script>
+
+    </script>
+</body>
+</html>

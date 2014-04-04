@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <title>新建抽奖|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+</head>
+<body>
+    <!--#include virtual="/iwamiadmin/header.html"-->
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse">
+            <form class="form-horizontal j_common_form" role="search" id="postForm"
+                  data-back-url="gift_luck_list.html">
+                <input type="hidden" name="id" class="j_common_form_autovalue" />
+                <input type="hidden" name="rank" value="0" class="j_common_form_autovalue" />
+                <input type="hidden" name="isdel" value="0" class="j_common_form_autovalue" />
+                <input type="hidden" name="iconSmall" value="" class="j_common_form_autovalue" />
+                <input type="hidden" name="iconBig" value="" class="j_common_form_autovalue" />
+                <input type="hidden" name="gifts" value="" class="" />
+                <input type="hidden" name="probs" value="" class="" />
+                <input type="hidden" name="counts" value="" class="" />
+                <div class="form-group iwami-input-group">
+                    抽奖所需米粒数：
+                    <input name="prize" type="text" class="form-control input-inline j_common_form_autovalue" size="10">
+                    米粒
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    抽奖图片：
+                    <input name="iconSmall" type="text" class="form-control input-inline j_common_form_autovalue" size="50">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    一等奖名称：
+                    <input type="text" class="form-control input-inline j_input_gifts" size="10">
+
+
+                    &nbsp;&nbsp;
+                    一等奖中奖概率：
+                    <input type="text" class="form-control input-inline j_input_probs" size="10">
+                    ‱
+
+                    &nbsp;&nbsp;
+                    每天上限数量：
+                    <input type="text" class="form-control input-inline j_input_counts" size="10">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                     二等奖名称：
+                    <input type="text" class="form-control input-inline j_input_gifts" size="10">
+
+                    &nbsp;&nbsp;
+                    二等奖中奖概率：
+                    <input type="text" class="form-control input-inline j_input_probs" size="10">
+                    ‱
+
+                    &nbsp;&nbsp;
+                    每天上限数量：
+                    <input type="text" class="form-control input-inline j_input_counts" size="10">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    三等奖名称：
+                    <input type="text" class="form-control input-inline j_input_gifts" size="10">
+
+                    &nbsp;&nbsp;
+                    三等奖中奖概率：
+                    <input type="text" class="form-control input-inline j_input_probs" size="10">
+                    ‱
+
+                    &nbsp;&nbsp;
+                    每天上限数量：
+                    <input type="text" class="form-control input-inline j_input_counts" size="10">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    四等奖名称：
+                    <input type="text" class="form-control input-inline j_input_gifts" size="10">
+
+                    &nbsp;&nbsp;
+                    四等奖中奖概率：
+                    <input type="text" class="form-control input-inline j_input_probs" size="10">
+                    ‱
+
+                    &nbsp;&nbsp;
+                    每天上限数量：
+                    <input type="text" class="form-control input-inline j_input_counts" size="10">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    <button type="cancel" class="btn btn-default">取消</button>
+                    <button type="submit" class="btn btn-default" id="btnSubmit">确定</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <div class="table-responsive" id="list"></div>
+    <!--#include virtual="/iwamiadmin/footer.html"-->
+    <!--#include virtual="/iwamiadmin/static/inc/upload.js.html"-->
+
+    <script>
+        (function(){
+            $.Iwami.selectNav('.j_nav_gift');
+            if($.Iwami.form.isEditMode()){
+                var gifts = $.Iwami.getParameter('gifts').split(',');
+                $('.j_input_gifts').each(function(i, o){
+                    this.value = gifts[i] || '';
+                });
+
+                var probs = $.Iwami.getParameter('probs').split(',');
+                $('.j_input_probs').each(function(i, o){
+                    this.value = probs[i] || '';
+                });
+
+                var counts = $.Iwami.getParameter('counts').split(',');
+                $('.j_input_counts').each(function(i, o){
+                    this.value = counts[i] || '';
+                });
+
+                $postForm = $('#postForm');
+                var postForm = $postForm[0];
+
+                $postForm.submit(function(e){
+                    e.preventDefault();
+
+                    var gifts = [];
+                    $('.j_input_gifts').each(function(i, o){
+                        gifts.push(this.value || '');
+                    });
+                    postForm.gifts.value = gifts.join(',');
+
+                    var probs = [];
+                    $('.j_input_probs').each(function(i, o){
+                        probs.push(this.value || '');
+                    });
+                    postForm.probs.value = probs.join(',');
+
+                    var counts = [];
+                    $('.j_input_counts').each(function(i, o){
+                        counts.push(this.value || '');
+                    });
+                    postForm.counts.value = counts.join(',');
+
+
+
+                    if($.Iwami.form.isEditMode()){
+                        $.post($.Iwami.rootUri + '/client/MOD/luck.ajax?adminid=' + $.Iwami.login.getUserId(),
+                                $postForm.serialize(), function(res){
+                                    if($.Iwami.ajax.validRes(res)){ //验证通过
+                                        if(res.status != 0){
+                                            $.Iwami.showTip('操作失败，请稍后再试', 2000, 'warning');
+                                        }else{
+                                            $.Iwami.showTip('操作成功！', 2000, 'success');
+                                            setTimeout(function(){
+                                                location.href = $postForm.attr('data-back-url');
+                                            }, 1500);
+                                        }
+                                    }
+                                }, 'json');
+
+                    }
+                });
+
+            }
+
+        })();
+
+    </script>
+    <script>
+
+    </script>
+</body>
+</html>

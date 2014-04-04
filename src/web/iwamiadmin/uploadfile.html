@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="Generator" content="EditPlus®">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <title>Document</title>
+     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.min.css" type="text/css" />
+     <script type="text/javascript" src="static/js/jquery-1.10.2.min.js"></script>
+     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.min.js"></script>
+ </head>
+ <body>
+    <form action="http://115.28.232.121/admin/client/ADD/file.ajax" method="post" target="_self" enctype="multipart/form-data">
+        <ul>
+            <li>
+            <input id="fileData" type="file" name="data" />
+            <input name="name" id="fileName" >
+            <input type="submit" value="确定" /></li>
+            <li>
+                <input id="good" name="good" />
+            </li>
+            <li>
+                <input id="good1" name="good1" />
+            </li>
+            <li>
+                <input id="good2" name="good2" />
+            </li>
+        </ul>
+    </form>
+    <script>
+        var fileData = document.getElementById('fileData');
+        var fileName = document.getElementById('fileName');
+        fileData.addEventListener('change', function(e){
+            fileName.value = fileData.value.match(/[^\\\/]+\.\S+/g)[0];
+        });
+    </script>
+ </body>
+</html>

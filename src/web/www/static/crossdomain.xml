@@ -1,0 +1,4 @@
+<cross-domain-policy>
+    <allow-access-from domain="www.lmj.com"/>
+    <allow-http-request-headers-from domain="*.lmj.com" headers="*"/>
+</cross-domain-policy>

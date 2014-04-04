@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <title>新增运营人员|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+</head>
+<body>
+    <!--#include virtual="/iwamiadmin/header.html"-->
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse">
+            <form class="form-horizontal j_common_form j_common_form_autosubmit" role="search" id="postForm"
+                  data-add-url="/client/ADD/admin.ajax"
+                  data-back-url="admin_list.html">
+                <input type="hidden" name="userid" class="j_common_form_autovalue" />
+                <input type="hidden" name="isdel" class="j_common_form_autovalue" />
+                <div class="form-group iwami-input-group">
+                    姓名：
+                    <input name="username" type="text" class="form-control input-inline j_common_form_autovalue" size="20">
+                </div>
+                <div class="form-group iwami-input-group">
+                    用户名：
+                    <input name="loginname" type="text" class="form-control input-inline j_common_form_autovalue" size="20">
+                </div>
+                <div class="form-group iwami-input-group">
+                    密码：
+                    <input name="password" type="text" class="form-control input-inline j_common_form_autovalue" size="20">
+                </div>
+                <div class="form-group iwami-input-group">
+                    手机号码：
+                    <input name="cellPhone" type="text" class="form-control input-inline j_common_form_autovalue" size="20">
+                </div>
+                <div class="form-group iwami-input-group">
+                    <input type="hidden" name="roles" class="j_common_form_autovalue" />
+                    权限：
+                    <label>
+                        <input type="checkbox" value="1" class="j_role_1" />用户管理
+                    </label>
+                    <label>
+                        <input type="checkbox" value="1" class="j_role_2" />兑换-银行卡提现
+                    </label>
+                    <label>
+                        <input type="checkbox" value="1" class="j_role_3" />兑换-支付宝提现
+                    </label>
+                    <label>
+                        <input type="checkbox" value="1" class="j_role_4" />兑换-手机充值卡
+                    </label>
+                    <label>
+                        <input type="checkbox" value="1" class="j_role_5" />兑换-线上礼品
+                    </label>
+                    <label>
+                        <input type="checkbox" value="1" class="j_role_6" />兑换-线下礼品
+                    </label>
+                    <label>
+                        <input type="checkbox" value="1" class="j_role_7" />兑换-抽奖
+                    </label>
+                </div>
+
+
+
+                <div class="form-group iwami-input-group">
+                    <button type="submit" class="btn btn-default" id="btnSubmit">确定</button>
+                </div>
+            </form>
+
+
+        </div>
+    </div>
+
+    <div class="table-responsive" id="list"></div>
+    <!--#include virtual="/iwamiadmin/footer.html"-->
+    <!--#include virtual="/iwamiadmin/static/inc/upload.js.html"-->
+
+    <script>
+        (function(){
+            $.Iwami.selectNav('.j_nav_admin');
+
+            var isEdit = $.Iwami.form.isEditMode();
+
+            if(isEdit){
+                var roles = $.Iwami.getParameter('form_roles');
+                roles = parseInt(roles, 10).toString(2);
+                for(var i =1; i <= 7; i++){
+                    if(roles.substr(-i,1) == 1){
+                        $('.j_role_'+i).attr('checked', 'checked');
+                    }
+                }
+            }
+
+            var $roles = $('input[name="roles"]');
+
+            $(':checkbox').on('change', function(e){
+                setRoles();
+            });
+            function setRoles(){
+                var role = '00000000000000000000'; //除开后8位
+                var role_real = ''; //后7位
+                for(var i = 7; i >= 1; i--){
+                    if($('.j_role_' + i)[0].checked){ //本位选中
+                        role_real += 1;
+                    }else{
+                        role_real += 0;
+                    }
+                }
+                if(role_real == '1111111'){ //后7位全部选中，后起第8位为1
+                    role += 1;
+                }else{
+                    role += 0;
+                }
+                role += role_real;
+                $roles.val(parseInt(role, 2)); //转2进制为10进制
+               // console.log(role_real,role)
+            }
+
+            if(isEdit){
+                $('.progress').hide();
+            }
+
+        })();
+
+    </script>
+    <script>
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <title>礼品顺序|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+</head>
+<body>
+    <!--#include virtual="/iwamiadmin/header.html"-->
+
+    <p>
+        <a class="btn btn-default" id="j_btn_savesort">
+            保存排序
+        </a>
+
+
+    </p>
+    <div class="table-responsive" id="list"></div>
+    <!--#include virtual="/iwamiadmin/footer.html"-->
+
+    <script id="listTmpl" type="text/html">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>操作</th>
+                <th>礼品ID</th>
+                <th>礼品名称</th>
+                <th>礼品类型</th>
+                <th>位置</th>
+            </tr>
+            </thead>
+            <tbody>
+                <%for(i = 0; i < data.length; i++){%>
+                    <%var item = data[i]%>
+                    <tr data-id="<%=item.id%>">
+                        <td>
+                            <a href="#" class="j_btn_move_up">
+                                上移
+                            </a>
+                            <a href="#" class="j_btn_move_down">
+                                下移
+                            </a>
+                        </td>
+                        <td><%=item.id%></td>
+                        <td><%=item.name%></td>
+                        <td><%=['线上快递','线上手机充值卡','线上支付宝','线上银行卡','线下','抽奖'][item.type]%></td>
+                        <td><%=item.rank%></td>
+                    </tr>
+                <%}%>
+            </tbody>
+        </table>
+    </script>
+
+    <script>
+        (function(){
+            $.Iwami.selectNav('.j_nav_gift');
+
+            //加载列表
+            $.get($.Iwami.rootUri + '/client/GET/presents.ajax', {
+                adminid: $.Iwami.login.getUserId()
+            }, function(res){
+                if($.Iwami.ajax.validRes(res)){ //验证通过
+                    $('#list').html(baidu.template('listTmpl', res));
+                }
+            }, 'json');
+
+            //表格的排序
+            $('#list').delegate('.j_btn_move_up, .j_btn_move_down', 'click', function(e){
+                e.preventDefault();
+                var $target = $(this);
+                var $targetTr = $target.closest('tr');
+
+                var direction = $target.hasClass('j_btn_move_up') ? 'up' : 'down';
+                if(direction === 'up'){
+                    var $prevTr = $targetTr.prev('tr:first');
+                    $targetTr.insertBefore($prevTr);
+                }else{
+                    var $nextTr = $targetTr.next('tr:first');
+                    $nextTr.insertBefore($targetTr);
+                }
+            });
+
+            //保存排序
+            $('#j_btn_savesort').click(function(e){
+                e.preventDefault();
+                var ids = [];
+                var ranks = [];
+                $('#list tbody tr').each(function(i, o){
+                    if(o.getAttribute('data-id')){
+                        ids.push(o.getAttribute('data-id'));
+                        ranks.push(i);
+                    }
+                });
+                $.post($.Iwami.rootUri + '/client/SEQ/present.ajax', {
+                    adminid: $.Iwami.login.getUserId(),
+                    ids: ids.join(','),
+                    ranks: ranks.join(',')
+                }, function(res){
+                    if($.Iwami.ajax.validRes(res)){ //验证通过
+                        $.Iwami.showTip('保存成功！', 2000, 'success');
+                    }
+                }, 'json');
+            });
+
+            //删除
+            $('#list').delegate('.j_btn_del', 'click', function(e){
+                e.preventDefault();
+                var $target = $(this);
+                if(!confirm('你确认删除此焦点图吗？')){
+                    return false;
+                }
+                var $parentTr = $target.closest('tr');
+                $.post($.Iwami.rootUri + '/client/DEL/image.ajax', {
+                    adminid: $.Iwami.login.getUserId(),
+                    id: $parentTr.attr('data-id')
+                }, function(res){
+                    if($.Iwami.ajax.validRes(res)){ //验证通过
+                        if(res.status != 0){
+                            $.Iwami.showTip('删除失败，请稍后再试', 2000, 'warning');
+                        }else{
+                            $.Iwami.showTip('删除成功！', 2000, 'success');
+                            $parentTr.remove();
+                        }
+                    }
+                }, 'json');
+
+            })
+
+        })();
+
+    </script>
+    <script>
+
+    </script>
+</body>
+</html>

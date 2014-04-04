@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+
+    <title>爱挖5米官网</title>
+    <link type="text/css" rel="stylesheet" href="static/css/1.css">
+</head>
+<body ontouchstart="touchStart(event)" ontouchmove="touchMove(event);" ontouchend="touchEnd(event);">
+<div class="fakeheader"></div>
+<div class="header">
+    <a href="#" class="header-back"></a>
+    <h1>爱挖米6官网</h1>
+</div>
+
+<div class="screen screen-1 slide-item" style="top: 0%">
+    <div><img src="static/images/screen-1-bg.png" style="max-height: 90%;max-width: 100%;"/></div>
+
+</div>
+
+<div class="screen screen-2 slide-item">
+    <div><img src="static/images/screen-2-bg.png" style="max-height: 90%;max-width: 100%;"/></div>
+</div>
+
+<div class="screen screen-3 slide-item">
+    <div><img src="static/images/screen-3-bg.png" style="max-height: 90%;max-width: 100%;"/></div>
+
+</div>
+
+
+<div class="page-img-up">
+    <img src="static/images/scrolltop.png" alt="">
+</div>
+
+<div class="screen screen-4 slide-item">
+    <div><img src="static/images/screen-4-bg.png" style="max-height: 90%;max-width: 100%;"/></div>
+    <div class="download">
+        <a id="downBtn" href="http://www.iwami.cn/download"><img src="static/images/screen-4-dl.png"></a>
+    </div>
+</div>
+
+
+</body>
+</html>
+<script>
+    var _initY = 0;
+    var _finishX = 0;
+    var _finishY = 0;
+    var _startX = 0;
+    var _startY = 0;
+
+    var slideItem = document.querySelectorAll('.slide-item');
+    var currentItem = 0;
+    var isGoing = false;
+
+
+
+
+
+    function touchStart(event) {
+        _startY = event.touches[0].clientY;
+        _initY = _startY;
+    }
+    function touchMove(event) {
+        var touches = event.touches;
+        var _endY = event.touches[0].clientY;
+        _finishY = _endY;
+
+        event.preventDefault();
+        return;
+
+        //var _absY = Math.abs(_endY-_startY);
+        //var lastX = slideUl.style.left.replace('px','') || 0;
+        if(_startY>_endY){ //向上滑动
+            goUp();
+        }else{
+            goDown();
+        }
+        _startY = _endY;
+    }
+    function goUp(){
+        console.log('goUp',currentItem)
+        if(isGoing || currentItem >= slideItem.length -1){
+            return;
+        }
+        isGoing = true;
+        setTimeout(function(){
+            isGoing = false;
+        }, 1000);
+        slideItem[currentItem].style.top = '-100%';
+        slideItem[currentItem + 1].style.top = '0%';
+        currentItem = currentItem + 1;
+    }
+    function goDown(){
+        console.log('goDown')
+
+        if(isGoing || currentItem < 1){
+            return;
+        }
+        isGoing = true;
+        setTimeout(function(){
+            isGoing = false;
+        }, 1000);
+        slideItem[currentItem].style.top = '100%';
+        slideItem[currentItem - 1].style.top = '0%';
+        currentItem = currentItem - 1;
+    }
+    //触屏  离开屏幕事件Y
+    function touchEnd(event) {
+        console.log('touchEnd', event)
+
+
+
+        event.preventDefault();
+        //var _absY = Math.abs(_endY-_startY);
+        //var lastX = slideUl.style.left.replace('px','') || 0;
+        if(_startY>_finishY){ //向上滑动
+            goUp();
+        }else{
+            goDown();
+        }
+        _startY = _finishY;
+    }
+
+    setTimeout(function() { window.scrollTo(0, 1); }, 100);
+
+    document.getElementById('downBtn').setAttribute('href', 'http://www.iwami.cn/download' + location.search);
+
+
+
+
+</script>

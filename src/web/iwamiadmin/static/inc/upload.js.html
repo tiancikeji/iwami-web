@@ -1,0 +1,96 @@
+<script src="static/uploader/uploader_core.js"></script>
+<script src="static/uploader/uploader_manager_flash.js"></script>
+<script>
+    (function(){
+        function initUploadContainer($ctn){
+            var $upBtn = $ctn.find('.j_upload_btn');
+            $upBtn.css({
+                visibility: 'visible',
+                width: '48px'
+            });
+            $ctn.find('.progress').hide();
+            $ctn.find('.j_upload_result').hide();
+        }
+        $('.j_upload_ctn').each(function(i, o){
+            var $ctn = $(this);
+            var $upBtn = $ctn.find('.j_upload_btn');
+            var $progressCtn = $ctn.find('.progress');
+            var $progressBar = $progressCtn.find('.progress-bar');
+            var $progressText = $ctn.find('.sr-only');
+            var $progressResult = $ctn.find('.j_upload_result');
+           console.log($ctn.find('input'))
+
+            if(!$progressResult.length){ //有些页面没有result容器
+                $progressResult = $('<div class="j_upload_result"></div>').appendTo($ctn);
+            }
+
+
+
+            var fileUpload = new $.FileUp({
+                uploadButton: $upBtn,
+                upload: {
+                    url: 'http://yy.iwami.cn/client/ADD/file.ajax?adminid=' + $.cookie('userid'), //上传地址
+                    //url: 'http://www.libmw.com/filemanager/upload.php',
+                    auto: true, //自动上传
+                    format: 'jpg|png|apk' //图片格式筛选，支持jpg gif bmp png
+                }
+            });
+            fileUpload.bind('selected', function(e,data){
+                $upBtn.css({
+                    width: 1
+                });
+                $progressCtn.show();
+                $progressBar.css('width', '1%');;
+            });
+            fileUpload.bind('progress', function(e,data){
+                // console.log('progress',data);
+                $progressBar.css('width', data.percent + '%');
+                $progressText.html(data.percent + '%');
+            });
+            fileUpload.bind('complete', function(e,data){
+                //  console.log(e, data);
+
+                var response = data.response;
+
+                if($.Iwami.ajax.validRes(response)){ //验证通过
+                    if(response && response.status == 0){
+                        $ctn.find('input').val(data.response.url);
+                        completeBar(data.response.url);
+                    }else{
+                        alert('上传失败,请重新上传');
+                        initUploadContainer($ctn);
+                    }
+                }
+
+            });
+            fileUpload.bind('error', function(e,data){
+                alert('上传失败,请重新上传');
+                initUploadContainer($ctn);
+            });
+
+            var fileUrl = $ctn.find('input').val();
+            if(fileUrl){
+                $upBtn.css({
+                    width: 1
+                });
+                completeBar(fileUrl);
+            }
+
+            function completeBar(fileUrl){
+                $progressBar.closest('.progress').hide();
+                var filename = fileUrl.match(/[^\/]+$/,'');
+                filename = filename === null ? fileUrl : filename[0];
+                $progressResult.html('<a href="'+fileUrl+'" target="_blank">'+ filename +'</a>&nbsp;&nbsp;' +
+                        '<a href="'+fileUrl+'" class="j_upload_del">删除</a>').show();
+                $progressBar.css('width', '100%');
+            }
+
+
+        }).delegate('.j_upload_del', 'click', function(e){
+                    e.preventDefault();
+                    var $ctn = $(e.delegateTarget);
+                    $ctn.find('input').val('');
+                    initUploadContainer($ctn);
+                });
+    })();
+</script>

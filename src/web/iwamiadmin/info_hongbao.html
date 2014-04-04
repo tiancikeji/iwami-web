@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <title>红包任务触发条件|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+</head>
+<body>
+<!--#include virtual="/iwamiadmin/header.html"-->
+<div class="navbar navbar-default" role="navigation">
+    <div class="collapse navbar-collapse">
+        <form class="navbar-form navbar-left" role="search" id="conditionForm">
+            红包任务触发条件：
+            <input name="days" type="text" class="form-control input-inline" placeholder="" size="10">
+            天
+            <input name="count" type="text" class="form-control input-inline" placeholder="" size="10">
+            次
+            <button type="submit" class="btn btn-default">确认修改</button>
+        </form>
+    </div>
+</div>
+
+<!--#include virtual="/iwamiadmin/footer.html"-->
+
+
+<script src="static/datepick/lhgcore.lhgcalendar.min.js"></script>
+<script>
+    (function(){
+        $.Iwami.selectNav('.j_nav_info');
+
+        //红包任务触发条件
+        var $conditionForm = $('#conditionForm');
+
+        $.get($.Iwami.rootUri + '/client/GET/treasureconfig.ajax', {
+            adminid: $.Iwami.login.getUserId()
+        }, function(res){
+            if($.Iwami.ajax.validRes(res)){ //验证通过
+                $conditionForm.find('input[name="days"]').val(res.data.days);
+                $conditionForm.find('input[name="count"]').val(res.data.count);
+            }
+        }, 'json');
+
+        $conditionForm.submit(function(e){
+            e.preventDefault();
+            $.post($.Iwami.rootUri + '/client/MOD/treasureconfig.ajax?adminid=' + $.Iwami.login.getUserId(),
+                    $conditionForm.serialize(), function(res){
+                        if($.Iwami.ajax.validRes(res)){ //验证通过
+                            $.Iwami.showTip('修改成功', 1000, 'success')
+                        }
+                    }, 'json');
+        });
+
+
+    })();
+
+</script>
+<script>
+
+</script>
+</body>
+</html>

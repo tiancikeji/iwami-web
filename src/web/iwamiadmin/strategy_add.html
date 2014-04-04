@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <title>新建攻略|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+</head>
+<body>
+    <!--#include virtual="/iwamiadmin/header.html"-->
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse">
+            <form class="form-horizontal j_common_form j_common_form_autosubmit" role="search" id="postForm"
+                  data-edit-url="/client/MOD/strategy.ajax"
+                  data-add-url="/client/ADD/strategy.ajax"
+                  data-back-url="strategy_list.html">
+                <input type="hidden" name="id" class="j_common_form_autovalue" />
+                <input type="hidden" name="rank" value="0" class="j_common_form_autovalue" />
+                <input type="hidden" name="isdel" value="0" class="j_common_form_autovalue" />
+                <input type="hidden" name="skim" value="0" class="j_common_form_autovalue" />
+                <input type="hidden" name="rate" value="0" class="j_common_form_autovalue" />
+                <div class="form-group iwami-input-group">
+                    攻略名称：
+                    <input name="name" type="text" class="form-control input-inline j_common_form_autovalue" size="50">
+                </div>
+                <div class="form-group iwami-input-group ">
+                    攻略子标题：
+                    <input name="subname" type="text" class="form-control input-inline j_common_form_autovalue" size="50">
+                </div>
+                <div class="form-group iwami-input-group">
+                    攻略简介：
+                    <input name="intr" type="text" class="form-control input-inline j_common_form_autovalue" size="50">
+                </div>
+                <div class="form-group iwami-input-group">
+                    浏览次数：
+                    <input name="skim" type="text" class="form-control input-inline j_common_form_autovalue" size="50">
+                </div>
+                <div class="form-group iwami-input-group">
+                    被赞次数：
+                    <input name="rate" type="text" class="form-control input-inline j_common_form_autovalue" size="50">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    攻略小图：
+                    <input name="iconSmall" type="text" class="form-control input-inline  j_common_form_autovalue" placeholder="" size="100">
+                </div>
+                <div class="form-group iwami-input-group">
+                    攻略焦点图：
+                    <input name="iconBig" type="text" class="form-control input-inline  j_common_form_autovalue" placeholder="" size="100">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    <button type="cancel" class="btn btn-default">取消</button>
+                    <button type="submit" class="btn btn-default">确定</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive" id="list"></div>
+    <!--#include virtual="/iwamiadmin/footer.html"-->
+    <!--#include virtual="/iwamiadmin/static/inc/upload.js.html"-->
+
+    <script>
+        (function(){
+            $.Iwami.selectNav('.j_nav_strategy');
+
+            var isEdit = $.Iwami.form.isEditMode();
+
+            var $postForm = $('#postForm');
+/*
+            $('#btnSubmit').click(function(e){
+                e.preventDefault();
+                if(isEdit){
+                    //先编辑攻略再提交攻略详情
+                    $.post($.Iwami.rootUri + '/client/MOD/strategy.ajax?adminid=' + $.Iwami.login.getUserId(),
+                            $postForm.serialize(), function(res){
+                                if($.Iwami.ajax.validRes(res)){ //验证通过
+                                    if(res.status != 0){
+                                        $.Iwami.showTip('编辑攻略失败，请稍后再试', 2000, 'warning');
+                                    }else{
+                                        $.Iwami.showTip('编辑攻略成功！', 2000, 'success');
+                                    }
+                                }
+                                //编辑详情
+                                postInfo();
+                            }, 'json');
+                }else{
+                    //先添加攻略:
+                    $.post($.Iwami.rootUri + '/client/ADD/strategy.ajax?adminid=' + $.Iwami.login.getUserId(),
+                        $postForm.serialize(), function(res){
+                            if($.Iwami.ajax.validRes(res)){ //验证通过
+                                if(res.status != 0){
+                                    $.Iwami.showTip('添加攻略失败，请稍后再试', 2000, 'warning');
+                                }else{
+                                    $.Iwami.showTip('添加攻略成功！', 2000, 'success');
+                                    $('#strategyid').val(res.data); //设置攻略ID
+                                    //然后添加详情
+                                    postInfo();
+                                }
+                            }
+                        }, 'json');
+                }
+            });
+
+            var $postFormSub = $('#postFormSub');
+            function postInfo(){
+                if(isEdit){
+                    //编辑详情
+                    $.post($.Iwami.rootUri + '/client/MOD/info.ajax?adminid=' + $.Iwami.login.getUserId(),
+                        $postFormSub.serialize(), function(res){
+                            if($.Iwami.ajax.validRes(res)){ //验证通过
+                                if(res.status != 0){
+                                    $.Iwami.showTip('编辑攻略详情失败，请稍后再试', 2000, 'warning');
+                                }else{
+                                    $.Iwami.showTip('编辑攻略详情成功！', 2000, 'success');
+                                }
+                            }
+                    }, 'json');
+                }else{
+                    //然后添加详情
+                    $.post($.Iwami.rootUri + '/client/ADD/info.ajax?adminid=' + $.Iwami.login.getUserId(),
+                        $postFormSub.serialize(), function(res){
+                            if($.Iwami.ajax.validRes(res)){ //验证通过
+                                if(res.status != 0){
+                                    $.Iwami.showTip('添加详情失败，请稍后再试', 2000, 'warning');
+                                }else{
+                                    $.Iwami.showTip('操作成功！', 2000, 'success');
+                                }
+                            }
+                    }, 'json');
+                }
+
+            }
+
+            //编辑状态的初始化
+            if(isEdit){
+                $.get($.Iwami.rootUri + '/client/GET/info.ajax', {
+                    adminid: $.Iwami.login.getUserId(),
+                    strategyid: $.Iwami.getParameter('form_id')
+                }, function(res){
+                    if($.Iwami.ajax.validRes(res)){ //验证通过
+                        var resData = res.data[0];
+                        $postFormSub.find('input[name="title"]').val(resData.title);
+                        $postFormSub.find('textarea[name="content"]').val(resData.content);
+                        $postFormSub.find('input[name="url"]').val(resData.url);
+                    }
+                }, 'json');
+            }*/
+        })();
+
+    </script>
+    <script>
+
+    </script>
+</body>
+</html>

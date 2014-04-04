@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <title>线上礼品|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+</head>
+<body>
+    <!--#include virtual="/iwamiadmin/header.html"-->
+    <!--#include virtual="/iwamiadmin/inc_nav_gift.html"-->
+
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse">
+            <form class="form-horizontal" role="search" id="postForm">
+                <div class="form-group iwami-input-group">
+                    礼品状态：
+                    <select name="status" class="form-control input-inline">
+                        <option value="1">启用</option>
+                        <option value="0">全部</option>
+                        <option value="2">停用</option>
+                    </select>&nbsp;&nbsp;
+                    <button type="submit" class="btn btn-default">搜索</button>
+                    <a class="btn btn-default" style="margin-left: 20px;" href="gift_online_edit.html" target="_blank">新建线上礼品</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive" id="list"></div>
+    <!--#include virtual="/iwamiadmin/footer.html"-->
+
+    <script id="listTmpl" type="text/html">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>操作</th>
+                <th>礼品ID</th>
+                <th>礼品名称</th>
+                <th>礼品类型</th>
+                <th>礼品状态</th>
+                <th>所需米粒</th>
+                <th>图片</th>
+            </tr>
+            </thead>
+            <tbody>
+            <%for(i = 0; i < data.length; i++){%>
+            <%var item = data[i]%>
+
+            <tr data-id="<%=item.id%>">
+                <td class="iwami-list-op">
+                    <a href="gift_online_edit.html?form_edit_mode=1<%for(var name in item){%>&form_<%=name%>=<%:u=item[name]%><%}%>"
+                       >
+                        编辑
+                    </a>
+                    <a href="#" class="j_btn_stop j_btn_op"
+                       data-form="<%for(var name in item){%><%if(name != 'isdel'){%>&<%=name%>=<%:u=item[name]%><%}%><%}%>&isdel=<%=1-item.isdel%>">
+                        <%if(item.isdel == 0){%>停用<%}else{%>启用<%}%>
+                    </a>
+                </td>
+                <td><%=item.id%></td>
+                <td><%=item.name%></td>
+                <td><%=['线上快递','线上手机充值卡','线上支付宝','线上银行卡','线下','抽奖'][item.type]%></td>
+                <td><%=['启用','停用'][item.isdel]%></td>
+                <td><%=item.prize%>米粒</td>
+                <td><a href="<%=item.iconSmall%>" target="_blank"><img src="<%=item.iconSmall%>" class="iwami-list-img" /></a></td>
+            </tr>
+            <%}%>
+            </tbody>
+        </table>
+    </script>
+
+
+    <script>
+        (function(){
+            $.Iwami.selectNav('.j_nav_gift');
+            $('.j_nav_gift .j_online').addClass('active');
+
+
+            //加载列表
+            function loadList(){
+                $.get($.Iwami.rootUri + '/client/GET/online.ajax?adminid=' + $.Iwami.login.getUserId(),
+                        $postForm.serialize(), function(res){
+                            if($.Iwami.ajax.validRes(res)){ //验证通过
+                                $('#list').html(baidu.template('listTmpl', res));
+                            }
+                        }, 'json');
+            }
+
+            var $postForm = $('#postForm');
+
+            $postForm.submit(function(e){
+                e.preventDefault();
+                loadList();
+            });
+            loadList();
+
+
+            //删除
+            $('#list').delegate('.j_btn_stop', 'click', function(e){
+                e.preventDefault();
+                var $target = $(this);
+                $.post($.Iwami.rootUri + '/client/MOD/online.ajax?adminid='+$.Iwami.login.getUserId(),
+                        $target.attr('data-form'), function(res){
+                            if($.Iwami.ajax.validRes(res)){ //验证通过
+                                if(res.status != 0){
+                                    $.Iwami.showTip('操作失败，请稍后再试', 2000, 'warning');
+                                }else{
+                                    $.Iwami.showTip('操作成功！', 2000, 'success');
+                                    loadList();
+                                }
+                            }
+                        }, 'json');
+            });
+
+        })();
+
+    </script>
+    <script>
+
+    </script>
+    </body>
+</html>

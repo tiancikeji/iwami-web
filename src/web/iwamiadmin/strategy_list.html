@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <title>攻略列表|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+</head>
+<body>
+    <!--#include virtual="/iwamiadmin/header.html"-->
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+            <form class="navbar-form navbar-left" role="search" id="searchForm">
+                <div class="form-group">
+                    <input name="key" type="text" class="form-control" placeholder="输入攻略ID或名称搜索">
+                </div>
+                <button type="submit" class="btn btn-default">搜索攻略</button>
+            </form>
+        </div>
+    </div>
+
+    <p>
+        <a class="btn btn-default" id="j_btn_savesort">
+            保存排序
+        </a>
+
+        <a class="btn btn-default" href="strategy_add.html">
+            新建攻略
+        </a>
+    </p>
+
+    <div class="table-responsive" id="list"></div>
+    <!--#include virtual="/iwamiadmin/footer.html"-->
+
+    <script id="listTmpl" type="text/html">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>攻略ID</th>
+                <th>攻略名称</th>
+                <th>攻略简介</th>
+                <th>小图</th>
+                <th>焦点图</th>
+                <th>被赞次数</th>
+                <th>默认排序</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+                <%for(i = 0; i < data.length; i++){%>
+                    <%var item = data[i]%>
+                    <tr data-id="<%=item.id%>">
+                        <td><%=item.id%></td>
+                        <td><%=item.name%></td>
+                        <td><%=item.intr%></td>
+                        <td><a href="<%=item.iconSmall%>" target="_blank">查看图片</a></td>
+                        <td><a href="<%=item.iconBig%>" target="_blank">查看图片</a></td>
+                        <td><%=item.rate%></td>
+                        <td><%=item.rank%></td>
+                        <td>
+                            <a href="strategy_add.html?form_edit_mode=1<%for(var name in item){%>&form_<%=name%>=<%:u=item[name]%><%}%>"
+                               >
+                                编辑
+                            </a>
+                            <a href="#" class="j_btn_move_up">
+                                上移
+                            </a>
+                            <a href="#" class="j_btn_move_down">
+                                下移
+                            </a>
+                            <a href="#" class="j_btn_del">
+                                删除
+                            </a><br />
+                            <a href="strategy_info_list.html?form_strategyid=<%:u=item.id%>&form_name=<%:u=item.name%>"
+                               target="_blank">
+                                详情管理
+                            </a>
+                        </td>
+                    </tr>
+                <%}%>
+            </tbody>
+        </table>
+    </script>
+
+    <script>
+        (function(){
+            $.Iwami.selectNav('.j_nav_strategy');
+
+            $('#searchForm').submit(function(e){
+                e.preventDefault();
+                showList($(this).find('input[name="key"]').val());
+            });
+
+            function showList(key){
+                $.get($.Iwami.rootUri + '/client/GET/strategy.ajax', {
+                    adminid: $.Iwami.login.getUserId(),
+                    key: key || ''
+                }, function(res){
+                    if($.Iwami.ajax.validRes(res)){ //验证通过
+                        $('#list').html(baidu.template('listTmpl', res));
+                    }
+                }, 'json');
+            }
+            showList();
+
+            //表格的排序
+            $('#list').delegate('.j_btn_move_up, .j_btn_move_down', 'click', function(e){
+                e.preventDefault();
+                var $target = $(this);
+                var $targetTr = $target.closest('tr');
+
+                var direction = $target.hasClass('j_btn_move_up') ? 'up' : 'down';
+                if(direction === 'up'){
+                    var $prevTr = $targetTr.prev('tr:first');
+                    $targetTr.insertBefore($prevTr);
+                }else{
+                    var $nextTr = $targetTr.next('tr:first');
+                    $nextTr.insertBefore($targetTr);
+                }
+            });
+
+            //保存排序
+            $('#j_btn_savesort').click(function(e){
+                e.preventDefault();
+                var ids = [];
+                var ranks = [];
+                $('#list tbody tr').each(function(i, o){
+                    if(o.getAttribute('data-id')){
+                        ids.push(o.getAttribute('data-id'));
+                        ranks.push(i);
+                    }
+                });
+                $.post($.Iwami.rootUri + '/client/SEQ/strategy.ajax', {
+                    adminid: $.Iwami.login.getUserId(),
+                    ids: ids.join(','),
+                    ranks: ranks.join(',')
+                }, function(res){
+                    if($.Iwami.ajax.validRes(res)){ //验证通过
+                        $.Iwami.showTip('保存成功！', 2000, 'success');
+                    }
+                }, 'json');
+            });
+
+            //删除攻略
+            $('#list').delegate('.j_btn_del', 'click', function(e){
+                e.preventDefault();
+                var $target = $(this);
+                if(!confirm('你确认删除此攻略吗？')){
+                    return false;
+                }
+                var $parentTr = $target.closest('tr');
+                $.post($.Iwami.rootUri + '/client/DEL/strategy.ajax', {
+                    adminid: $.Iwami.login.getUserId(),
+                    id: $parentTr.attr('data-id')
+                }, function(res){
+                    if($.Iwami.ajax.validRes(res)){ //验证通过
+                        if(res.status != 0){
+                            $.Iwami.showTip('删除失败，请稍后再试', 2000, 'warning');
+                        }else{
+                            $.Iwami.showTip('删除成功！', 2000, 'success');
+                            $parentTr.remove();
+                        }
+                    }
+                }, 'json');
+
+            })
+
+
+        })();
+
+    </script>
+    <script>
+
+    </script>
+</body>
+</html>

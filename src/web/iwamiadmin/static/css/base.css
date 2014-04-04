@@ -1,0 +1,154 @@
+/**
+	* @description : tab选项卡基类？扩展类
+	* @author	   : limengjun(14-3-10)
+	* @update	   : limengjun(14-3-10)
+**/
+form .input-inline{
+    display: inline;
+    width: auto;
+}
+.iwami-input-group{
+    padding: 5px;
+}
+.iwami-list-img{
+    width: 100px;
+}
+.iwami-list-op a{
+    white-space: nowrap;
+    display: block;
+}
+.navbar-collapse{
+    max-height: 5000px;
+}
+
+.iwami-up-ctn{
+    display: inline-block;
+}
+
+.iwami-up-ctn .iwami-up-btn{
+    display: inline-block;
+    background: url(../images/office-upload-center.png) 1px 0 no-repeat;
+    width: 48px;
+    height: 48px;
+    overflow: hidden;
+}
+.iwami-up-ctn .progress{
+    display: none;
+    width: 200px;
+    margin-bottom: 0;
+}
+
+/*表单验证失败*/
+.ui-input-error {
+    border-color: #a94442;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+}
+
+/*ui-tips*/
+.ui-tips{
+    position: absolute;
+    z-index: 200;
+    padding: 1px;
+    text-align: left;
+    background-color: #ffffff;
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding;
+    background-clip: padding-box;
+    border: 1px solid #fb7f75;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    -webkit-box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+    white-space: normal;
+}
+
+.ui-tips-right{
+    -webkit-box-shadow: -1px 1px 3px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: -1px 1px 3px rgba(0, 0, 0, 0.4);
+    box-shadow: -1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+.ui-tips-bottom{
+    -webkit-box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+    box-shadow: 1px -1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.ui-tips .ui-tips-arrow{
+    position: absolute;
+    border-width: 9px;
+    width: 0;
+    height: 0;
+}
+.ui-tips .ui-tips-arrow i{
+    position: absolute;
+    border-width: 8px;
+    width: 0;
+    height: 0;
+}
+.ui-tips .ui-tips-bd{
+    padding: 18px;
+}
+
+.ui-tips-bottom .ui-tips-arrow{
+    border-color: #fb7f75 transparent transparent transparent;
+    border-style: solid dashed dashed dashed;
+    bottom: -18px;
+}
+.ui-tips-bottom .ui-tips-arrow i{
+    border-color: #fff transparent transparent transparent;
+    border-style: solid dashed dashed dashed;
+    margin-left: -8px;
+    left: 50%;
+    top: -9px;
+}
+
+.ui-tips-top .ui-tips-arrow{
+    border-color: transparent transparent #fb7f75 transparent;
+    border-style: dashed dashed solid dashed;
+    top: -18px;
+}
+.ui-tips-top .ui-tips-arrow i{
+    border-color: transparent transparent #fff transparent;
+    border-style: dashed dashed solid dashed;
+    margin-left: -8px;
+    left: 50%;
+    bottom: -9px;
+}
+
+.ui-tips-left .ui-tips-arrow{
+    border-color: transparent #fb7f75 transparent transparent;
+    border-style: dashed solid dashed dashed;
+    left: -18px;
+}
+.ui-tips-left .ui-tips-arrow i{
+    border-color: transparent #fff transparent transparent;
+    border-style: dashed solid dashed dashed;
+    margin-bottom: -8px;
+    bottom: 50%;
+    right: -9px;
+}
+
+.ui-tips-right .ui-tips-arrow{
+    border-color: transparent transparent transparent #fb7f75;
+    border-style: dashed dashed dashed solid;
+    right: -18px;
+}
+.ui-tips-right .ui-tips-arrow i{
+    border-color: transparent transparent transparent #fff;
+    border-style: dashed dashed dashed solid;
+    margin-bottom: -8px;
+    bottom: 50%;
+    left: -9px;
+}
+
+/*导航菜单visible none,用于权限管理*/
+.iwami-nav-menu{
+    visibility: hidden;
+}
+
+.text-right{
+    text-align: right;
+}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <title>信息编辑-提示信息|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+</head>
+<body>
+    <!--#include virtual="/iwamiadmin/header.html"-->
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse">
+            <form class="form-horizontal j_common_form j_common_form_autosubmit" role="search" id="postForm1"
+                  data-add-url="/client/MOD/tip.ajax"
+                  data-edit-url="/client/MOD/tip.ajax">
+                <input type="hidden" name="type" value="1" />
+                <h3>挖米-无任务提示</h3>
+
+                <div class="form-group iwami-input-group">
+                    内容：
+                    <textarea name="content" cols="120" rows="5"></textarea>
+                </div>
+                <div class="form-group iwami-input-group">
+                    <button type="submit" class="btn btn-default">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse">
+            <form class="form-horizontal j_common_form j_common_form_autosubmit" role="search" id="postForm2"
+                  data-add-url="/client/MOD/tip.ajax"
+                  data-edit-url="/client/MOD/tip.ajax">
+                <input type="hidden" name="type" value="2" />
+                <h3>兑换-无礼品提示</h3>
+
+                <div class="form-group iwami-input-group">
+                    内容：
+                    <textarea name="content" cols="120" rows="5"></textarea>
+                </div>
+                <div class="form-group iwami-input-group">
+                    <button type="submit" class="btn btn-default">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse">
+            <form class="form-horizontal j_common_form j_common_form_autosubmit" role="search" id="postForm3"
+                  data-add-url="/client/MOD/tip.ajax"
+                  data-edit-url="/client/MOD/tip.ajax">
+                <input type="hidden" name="type" value="3" />
+                <h3>分享内容（微博，微信，朋友圈）</h3>
+                <div class="form-group iwami-input-group">
+                    内容：
+                    <textarea name="content" cols="120" rows="5"></textarea>
+                </div>
+                <div class="form-group iwami-input-group">
+                    <button type="submit" class="btn btn-default">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse">
+            <form class="form-horizontal j_common_form j_common_form_autosubmit" role="search" id="postForm4"
+                  data-add-url="/client/MOD/tip.ajax"
+                  data-edit-url="/client/MOD/tip.ajax">
+                <input type="hidden" name="type" value="4" />
+                <h3>短信接收手机号</h3>
+                <div class="form-group iwami-input-group">
+                    手机号：
+                    <textarea name="content" cols="120" rows="5"></textarea>
+                    说明：多个手机号中间用英文字符“ ; （分号）”区分
+                </div>
+                <div class="form-group iwami-input-group">
+                    <button type="submit" class="btn btn-default">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+    <!--#include virtual="/iwamiadmin/footer.html"-->
+
+    <script>
+        (function(){
+            $.Iwami.selectNav('.j_nav_info');
+
+            $.get($.Iwami.rootUri + '/client/GET/tip.ajax?adminid=' + $.Iwami.login.getUserId(), function(res){
+                if($.Iwami.ajax.validRes(res)){ //验证通过
+                    if(res.status != 0){
+                        $.Iwami.showTip('获取信息失败', 2000, 'warning');
+                    }else{
+                        var data = res.data;
+                        for(var i = 0; i < data.length; i++){
+                            var formData = data[i];
+                            var $postForm = $('#postForm' + formData.type);
+
+                            if($postForm.length){ //当前表单存在
+                                var postForm = $postForm[0];
+                                for(var e = 0; e < postForm.elements.length; e++){
+                                    var ele = postForm.elements[e];
+                                    if(formData[ele.name]){
+                                        ele.value = formData[ele.name];
+                                    }
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+            }, 'json');
+
+
+        })();
+
+    </script>
+    <script>
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <title>用户管理|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+</head>
+<body>
+    <!--#include virtual="/iwamiadmin/header.html"-->
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+            <form class="navbar-form navbar-left" role="search" id="postForm">
+                <div class="form-group">
+                    <input type="text" name="key" class="form-control" placeholder="输入用户ID或手机号进行搜索">
+                </div>
+                <button type="submit" class="btn btn-default">搜索用户</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive" id="list"></div>
+    <!--#include virtual="/iwamiadmin/footer.html"-->
+
+    <script id="listTmpl" type="text/html">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>操作</th>
+                <th>用户ID</th>
+                <th>手机号</th>
+                <th>姓名</th>
+                <th>性别</th>
+                <th>年龄</th>
+                <th>职业</th>
+                <th>米粒</th>
+                <th>奖品地址</th>
+                <th>银行卡账号</th>
+                <th>开户银行</th>
+                <th>支付宝账号</th>
+                <th>创建日期</th>
+                <th>注册日期</th>
+                <th>上次登录时间</th>
+            </tr>
+            </thead>
+            <tbody>
+                <%for(i = 0; i < data.length; i++){%>
+                    <%var item = data[i]%>
+                    <tr data-userid="<%=item.userid%>">
+                        <th>
+                            <a href="#" class="btn btn-primary btn-lg j_btn_sendmsg">
+                                发送消息
+                            </a><br /><br />
+                            <a class="btn btn-primary btn-lg" href="user_add.html?form_edit_mode=1<%for(var name in item){%>&form_<%=name%>=<%:u=item[name]%><%}%>">
+                                编辑
+                            </a>
+                        </th>
+                        <th><%=item.userid%></th>
+                        <th><%=item.cellPhone%></th>
+                        <th><%=item.username%></th>
+                        <th><%=['帅哥','美女'][item.gender]%></th>
+                        <th><%=item.age%></th>
+                        <th><%=item.job%></th>
+                        <th><%=item.currentPrize%></th>
+                        <th><%=item.lastAddress%></th>
+                        <th><%=item.lastBankNo%></th>
+                        <th><%=item.lastBankName%></th>
+                        <th><%=item.lastAlipayAccount%></th>
+                        <th><%=item.createTime%></th>
+                        <th><%=item.addTime%></th>
+                        <th><%=item.lastLoginTime%></th>
+                    </tr>
+                <%}%>
+            </tbody>
+        </table>
+    </script>
+
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" id="sendModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">发送消息</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="valid.json" id="valid_form" onsubmit="return false;" class="form-horizontal">
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label">内容</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="message" placeholder="输入要发送的内容">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary">确认发送</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <script>
+        (function(){
+            $.Iwami.selectNav('.j_nav_usermanage');
+
+            function getUser(key){
+                $.get($.Iwami.rootUri + '/client/GET/user.ajax', {
+                    adminid: $.Iwami.login.getUserId(),
+                    key: key
+                }, function(res){
+                    if($.Iwami.ajax.validRes(res)){ //验证通过
+                        $('#list').html(baidu.template('listTmpl', res));
+                    }
+                }, 'json');
+            }
+            //getUser('');
+
+            var $postForm = $('#postForm');
+            $postForm.submit(function(e){
+                e.preventDefault();
+                getUser($postForm.find('input[name="key"]').val());
+            });
+
+
+
+            var $modal = $('#myModal');
+
+
+            $('#list').delegate('.j_btn_sendmsg', 'click', function(e){
+                e.preventDefault();
+                var $target = $(this);
+                var userId = $target.closest('tr').attr('data-userid');
+                $modal.data('userid', userId);
+                $('#sendModal').css('margin-top', $(window).height() / 2 - 180)
+                $modal.modal('show');
+                setTimeout(function(){
+                    $modal.find('input[name="message"]')[0].focus();
+                }, 500);
+            });
+
+
+            $modal.find('.btn-primary').click(function(e){
+                $.post($.Iwami.rootUri + '/client/PUSH/user.ajax', {
+                    adminid: $.Iwami.login.getUserId(),
+                    userid: $modal.data('userid'),
+                    msg: $modal.find('input[name="message"]').val()
+                }, function(res){
+                    if(res.status != 0){
+                        $.Iwami.showTip('发送失败，请稍后再试', 2000, 'warning');
+                    }else{
+                        $.Iwami.showTip('发送成功！', 2000, 'success');
+                        $modal.modal('hide');
+                    }
+                }, 'json');
+
+                $('#valid_form').scojs_valid({rules: {email: ['not_empty', 'email'], pass: ['not_empty', {'min_length': 4}], pass2: [{matches: 'pass'}]}});
+
+            });
+            $('input[name="key"]')[0].focus();
+        })();
+
+    </script>
+    <script>
+
+    </script>
+</body>
+</html>

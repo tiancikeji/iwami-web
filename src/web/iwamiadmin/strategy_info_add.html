@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <title>新建攻略详情|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+</head>
+<body>
+    <!--#include virtual="/iwamiadmin/header.html"-->
+
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+            <form class="navbar-form navbar-left" role="search">
+                <div class="form-group">
+                    攻略名称：<span id="strategyName"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse">
+
+            <form class="form-horizontal j_common_form j_common_form_autosubmit" role="search" id="postForm"
+                  data-edit-url="/client/MOD/info.ajax"
+                  data-add-url="/client/ADD/info.ajax"
+                  data-back-url="">
+                <input type="hidden" name="strategyid" class="j_common_form_autovalue" id="strategyid" />
+                <input type="hidden" name="rank" value="0" class="j_common_form_autovalue" />
+                <div class="form-group iwami-input-group">
+                    标题：
+                    <input name="title" type="text" class="form-control input-inline j_common_form_autovalue" size="50">
+                </div>
+                <div class="form-group iwami-input-group">
+                    内容：
+                    <textarea name="content" rows="10" cols="130" class="form-control input-inline j_common_form_autovalue" ></textarea>
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    图片：
+                    <input name="url" type="text" class="form-control input-inline  j_common_form_autovalue" placeholder="" size="100">
+                </div>
+
+                <div class="form-group iwami-input-group">
+                    <button type="cancel" class="btn btn-default">取消</button>
+                    <button type="submit" class="btn btn-default">确定</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!--#include virtual="/iwamiadmin/footer.html"-->
+    <!--#include virtual="/iwamiadmin/static/inc/upload.js.html"-->
+
+    <script>
+        (function(){
+            $.Iwami.selectNav('.j_nav_strategy');
+            $('#strategyName').html($.Iwami.getParameter('form_name'));
+            $('#strategyid').val($.Iwami.getParameter('form_strategyid'));
+
+            var $postForm = $('#postForm');
+
+            //设置回调地址
+            $postForm.attr('data-back-url', 'strategy_info_list.html?form_strategyid='+
+                    $.Iwami.getParameter('form_strategyid')+ '&form_name=' + $.Iwami.getParameter('form_name'));
+
+
+        })();
+
+    </script>
+    <script>
+
+    </script>
+</body>
+</html>
