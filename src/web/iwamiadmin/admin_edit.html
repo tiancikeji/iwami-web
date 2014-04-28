@@ -12,6 +12,7 @@
         <div class="collapse navbar-collapse">
             <form class="form-horizontal j_common_form j_common_form_autosubmit" role="search" id="postForm"
                   data-add-url="/client/ADD/admin.ajax"
+                  data-edit-url="/client/MOD/admin.ajax"
                   data-back-url="admin_list.html">
                 <input type="hidden" name="userid" class="j_common_form_autovalue" />
                 <input type="hidden" name="isdel" class="j_common_form_autovalue" />
@@ -82,7 +83,7 @@
                 var roles = $.Iwami.getParameter('form_roles');
                 roles = parseInt(roles, 10).toString(2);
                 for(var i =1; i <= 7; i++){
-                    if(roles.substr(-i,1) == 1){
+                    if(i <= roles.length && roles.substr(-i,1) == 1){
                         $('.j_role_'+i).attr('checked', 'checked');
                     }
                 }

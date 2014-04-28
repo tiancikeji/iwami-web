@@ -87,15 +87,15 @@
         <%for(i = 0; i < data.length; i++){%>
         <%var item = data[i]%>
         <tr data-id="<%=item.id%>">
-            <th><%=item.addTime%></th>
-            <th><%=item.estimateTime%></th>
-            <th><%=item.interval%></th>
-            <th><%=item.allCnt%></th>
-            <th><%=item.succCnt%></th>
-            <th><%=item.failCnt%></th>
-            <th><%=item.msg%></th>
-            <th><%=['新建','暂停','停止','恢复','推送成功','短信发送成功'][item.status]%></th>
-            <th>
+            <td><%=item.addTime%></td>
+            <td><%=item.estimateTime%></td>
+            <td><%=item.interval%></td>
+            <td><%=item.allCnt%></td>
+            <td><%=item.succCnt%></td>
+            <td><%=item.failCnt%></td>
+            <td><%=item.msg%></td>
+            <td><%=['新建','暂停','停止','恢复','推送成功','短信发送成功'][item.status]%></td>
+            <td>
                     <a href="#" class="j_btn_pause j_btn_op">
                         暂停
                     </a>
@@ -105,7 +105,7 @@
                     <a href="#" class="j_btn_stop j_btn_op">
                         停止
                     </a>
-            </th>
+            </td>
         </tr>
         <%}%>
         </tbody>

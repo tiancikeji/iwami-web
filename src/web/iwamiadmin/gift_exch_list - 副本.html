@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--#include virtual="/iwamiadmin/head.html"-->
+    <title>兑换列表|爱挖米后台管理系统</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+</head>
+<body>
+<!--#include virtual="/iwamiadmin/header.html"-->
+<div class="navbar navbar-default" role="navigation">
+    <div class="collapse navbar-collapse">
+        <form class="navbar-form navbar-left j_search" role="search" action="GET/exchuser.ajax">
+            <div class="form-group">
+                <input name="key" class="form-control" placeholder="输入用户ID或手机号进行搜索">
+            </div>
+            <button type="submit" class="btn btn-default">搜索用户</button>
+        </form>
+    </div>
+
+    <div class="collapse navbar-collapse">
+        <form class="navbar-form navbar-left  j_search" role="search" action="GET/exchpre.ajax">
+            <div class="form-group">
+                <input name="key" class="form-control" placeholder="输入礼品ID或名称进行搜索">
+            </div>
+            <button type="submit" class="btn btn-default">搜索礼品</button>
+        </form>
+    </div>
+
+    <div class="collapse navbar-collapse">
+        <form class="navbar-form navbar-left  j_search" role="search" action="GET/exch.ajax">
+            <div class="form-group">
+                礼品类型：
+                <select name="type">
+                    <option value="0">全部</option>
+                    <option value="1" class="j_permission" data-permission="5">线上礼品</option>
+                    <option value="2" class="j_permission" data-permission="4">线上手机充值卡</option>
+                    <option value="3" class="j_permission" data-permission="3">线上支付宝</option>
+                    <option value="4" class="j_permission" data-permission="2">线上银行卡</option>
+                    <option value="5" class="j_permission" data-permission="6">线下</option>
+                    <option value="6" class="j_permission" data-permission="7">抽奖</option>
+                </select>
+                &nbsp;&nbsp;
+                发货状态：
+                <select name="status">
+                    <option value="0">全部</option>
+                    <option value="1">未发货</option>
+                    <option value="2">已发货</option>
+                    <option value="3">线下礼品</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-default">搜索礼品</button>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive" id="list"></div>
+<!--#include virtual="/iwamiadmin/footer.html"-->
+
+<script id="listTmpl" type="text/html">
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>操作</th>
+            <th><div style="width:4em;">用户ID</div></th>
+            <th>兑换ID</th>
+            <th>礼品ID</th>
+            <th>礼品名称</th>
+            <th>礼品类型</th>
+            <th>状态</th>
+            <th>姓名</th>
+            <th>手机号</th>
+            <th>开户银行</th>
+            <th>银行卡号</th>
+            <th>支付宝账号</th>
+            <th>奖品地址</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%for(i = 0; i < data.list.length; i++){%>
+            <%var user = data.list[i]%>
+            <%for(p = 0; p < user.sended.length; p++){%>
+                <%var item = user.sended[p]%>
+                <tr>
+                    <%if(p==0){%>
+                        <th rowspan="<%=user.sended.length%>">
+                            <a href="#" class="btn btn-primary btn-lg j_btn_sendmsg" data-ids="<%=user.sended.ids%>">
+                                确认发货
+                            </a>
+                        </th>
+                    <%}%>
+                    <th><%=user.userid%></th>
+                    <th><%=item.id%></th>
+                    <th><%=item.presentId%></th>
+                    <th><%=item.presentName%></th>
+                    <th><%=['线上快递','线上手机充值卡','线上支付宝','线上银行卡','线下','抽奖'][item.presentType]%></th>
+                    <th><%=['无效状态','未发货','已发货','线下礼品'][item.status]%></th>
+                    <th><%=item.bankAccount%></th>
+                    <th><%=item.cellPhone%></th>
+                    <th><%=item.bankName%></th>
+                    <th><%=item.bankNo%></th>
+                    <th><%=item.alipayAccount%></th>
+                    <th><%=item.address%></th>
+                </tr>
+            <%}%>
+            <%for(p = 0; p < user.nosend.length; p++){%>
+                <%var item = user.nosend[p]%>
+                <tr data-id="<%=item.id%>">
+                    <th>
+                        &nbsp;
+                    </th>
+                    <th><%=item.id%></th>
+                    <th><%=item.presentId%></th>
+                    <th><%=item.presentName%></th>
+                    <th><%=['线上快递','线上手机充值卡','线上支付宝','线上银行卡','线下','抽奖'][item.presentType]%></th>
+                    <th><%=['无效状态','未发货','已发货','线下礼品'][item.status]%></th>
+                    <th><%=user.userid%></th>
+                    <th><%=item.bankAccount%></th>
+                    <th><%=item.cellPhone%></th>
+                    <th><%=item.bankNo%></th>
+                    <th><%=item.alipayAccount%></th>
+                    <th><%=item.address%></th>
+                </tr>
+            <%}%>
+        <%}%>
+        </tbody>
+    </table>
+</script>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">确认发货</h4>
+            </div>
+            <div class="modal-body">
+                <form action="valid.json" id="valid_form" onsubmit="return false;" class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label">快递公司</label>
+                        <div class="col-sm-10">
+                            <input name="name" class="form-control" placeholder="快递公司名称" size="20" type="text" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label">快递单号</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="no" placeholder="输入快递单号">
+                        </div>
+                    </div>
+                    <div class="form-group j_status_ctn">
+
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary">确认发货</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+    (function(){
+        $.Iwami.selectNav('.j_nav_gift');
+
+        //搜索功能
+        $('.j_search').submit(function(e){
+            e.preventDefault();
+            var $form = $(this);
+            $.get($.Iwami.rootUri + '/client/' + $form.attr('action') + '?adminid=' + $.Iwami.login.getUserId(),
+                    $form.serialize(), function(res){
+                if($.Iwami.ajax.validRes(res)){ //验证通过
+                    var list = res.data.list;
+                    //通过发货状态
+                    for(var i = 0; i < list.length; i++){
+                        list[i].sended = [];
+                        list[i].nosend = [];
+                        var ids = '';
+                        //按照发货未发货分类
+                        for(var p = 0; p < list[i].presents.length; p++){
+                            var present = list[i].presents[p];
+                            if(present.status == 1){//未发货
+                                ids += present.id + ',';
+                                list[i].sended.push(present);
+                            }else{
+                                list[i].nosend.push(present);
+                            }
+                        }
+                        list[i].sended.ids = ids; //id列表
+                    }
+                    $('#list').html(baidu.template('listTmpl', res));
+                }
+            }, 'json');
+        });
+
+
+
+        var $modal = $('#myModal');
+
+
+        $('#list').delegate('.j_btn_sendmsg', 'click', function(e){
+            e.preventDefault();
+            var $target = $(this);
+            $modal.data('ids', $target.attr('data-ids'));
+            $modal.modal('show');
+        });
+
+        var $sendStatus = $('');
+
+        //进行发货
+        function sendGift(ids, index){
+            if(ids[index]){
+                var id = ids[index];
+            }else{//全部发货完成
+                $.Iwami.showTip('发货成功！', 2000, 'success');
+                $modal.modal('hide');
+                setTimeout(function(){
+                    location.reload();
+                }, 2000);
+                return;
+            }
+            $modal.find('.j_status_ctn').html('&nbsp;&nbsp;&nbsp;正在发货第' + (index + 1) + '个礼品');
+            $.post($.Iwami.rootUri + '/client/MOD/exch.ajax', {
+                adminid: $.Iwami.login.getUserId(),
+                id: id,
+                name: $modal.find('select[name="name"]').val(),
+                no: $modal.find('input[name="no"]').val()
+            }, function(res){
+                if(res.status != 0){
+                    $.Iwami.showTip('礼品'+ id +'发货失败，请稍后再试', 2000, 'warning');
+                }else{
+                    sendGift(ids, index+1);
+                }
+            }, 'json');
+        }
+
+        $modal.find('.btn-primary').click(function(e){
+            var ids = $modal.data('ids').split(',');
+            sendGift(ids, 0);
+        });
+    })();
+
+</script>
+<script>
+
+</script>
+</body>
+</html>

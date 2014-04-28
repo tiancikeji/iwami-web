@@ -61,11 +61,13 @@
             <th><div style="width:4em;">兑换ID</div></th>
             <th><div style="width:4em;">礼品ID</div></th>
             <th><div style="width:10em;">礼品名称</div></th>
+            <th><div style="width:3em;">数量</div></th>
+            <th><div style="width:5em;">兑换金额</div></th>
             <th>礼品类型</th>
             <th>状态</th>
             <th>姓名</th>
-            <th>发货手机</th>
             <th>注册手机</th>
+            <th>发货手机</th>
             <th>开户银行</th>
             <th>银行卡号</th>
             <th>支付宝账号</th>
@@ -78,32 +80,37 @@
             <%var user = data.list[i]%>
             <%for(p = 0; p < user.presents.length; p++){%>
                 <%var item = user.presents[p]%>
-                <tr data-id="<%=item.id%>">
-                    <%if(item.status == 1){%>
-                        <td>
-                            <a href="#" class="btn btn-primary btn-lg j_btn_sendmsg">
-                                发货
-                            </a>
-                        </td>
-                    <%}else{%>
-                        <td>
-                            &nbsp;
+                <tr>
+                    <%if(p == 0){%>
+                        <td <%if(p == 0){%>rowspan="<%=user.presents.length%>"<%}%>>
+                            <%if(user.presents.ids){%>
+                                <a data-ids="<%=user.presents.ids%>" href="#" class="btn btn-primary btn-lg j_btn_sendgoods">
+                                    发货
+                                </a>
+                            <%}%>
+                            <%if(item.status == 2){%>
+                                <a data-userid="<%=user.userid%>" href="#" class="break-all j_btn_sendmsg" style="width: 4em;">
+                                    发消息
+                                </a>
+                            <%}%>
                         </td>
                     <%}%>
                     <td><%=user.userid%></td>
                     <td><%=item.id%></td>
                     <td><%=item.presentId%></td>
                     <td><%=item.presentName%></td>
-                    <td><div style="width:3em;word-break: break-all;"><%=['线上','电话卡','支付宝','银行卡','线下','抽奖'][item.presentType]%></div></td>
+                    <td><%=item.count%></td>
+                    <td><%=(item.money?(item.money+'元'):'')%></td>
+                    <td><div class="break-all" style="width:5em;"><%=['线上','电话卡','支付宝','银行卡','线下','抽奖'][item.presentType]%></div></td>
                     <td><div style="width:4em;word-break: break-all;"><%=['无效状态','未发货','已发货','线下礼品'][item.status]%></div></td>
                     <td><div style="width:4em;word-break: break-all;"><%=item.bankAccount%></div></td>
-                    <td><%=item.cellPhone%></td>
                     <td><%=item.userCellPhone%></td>
+                    <td><%=item.cellPhone%></td>
                     <td><div style="width:7em;word-break: break-all;"><%=item.bankName%></div></td>
                     <td><div style="width:10em;word-break: break-all;"><%=item.bankNo%></div></td>
                     <td><div style="width:6em;word-break: break-all;"><%=item.alipayAccount%></div></td>
                     <td><div style="width:10em;word-break: break-all;"><%=item.address%></div></td>
-                    <td><%=item.addTime%></td>
+                    <td><div class="break-all" style="width:6em;"><%=item.addTime%></div></td>
                 </tr>
             <%}%>
         <%}%>
@@ -148,6 +155,34 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!-- Modal -->
+<div class="modal fade" id="myMsgModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" id="sendMsgModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="">发送消息</h4>
+            </div>
+            <div class="modal-body">
+                <form action="valid.json" id="" onsubmit="return false;" class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label">内容</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="message" placeholder="输入要发送的内容">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary">确认发送</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
 <script>
     (function(){
         $.Iwami.selectNav('.j_nav_gift');
@@ -169,7 +204,21 @@
                     '&start='+ $.Iwami.listManager.start +'&step='+ $.Iwami.listManager.step,
                     $form.serialize(), function(res){
                         if($.Iwami.ajax.validRes(res)){ //验证通过
-                            res.count = res.count || 1000;
+                            res.count = res.data.count || 1000;
+                            var list = res.data.list;
+                            //通过发货状态
+                            for(var i = 0; i < list.length; i++){
+
+                                var ids = [];
+
+                                //按照发货未发货分类
+                                for(var p = 0; p < list[i].presents.length; p++){
+                                    if(list[i].presents[p].status == 1){ //未发货
+                                        ids.push(list[i].presents[p].id)
+                                    }
+                                }
+                                list[i].presents.ids = ids.join(','); //id列表
+                            }
                             $('#list').html(baidu.template('listTmpl', res));
                         }
                     }, 'json');
@@ -180,11 +229,11 @@
         var $modal = $('#myModal');
 
 
-        $('#list').delegate('.j_btn_sendmsg', 'click', function(e){
+        $('#list').delegate('.j_btn_sendgoods', 'click', function(e){
             e.preventDefault();
             var $target = $(this);
-            var id = $target.closest('tr').attr('data-id');
-            $modal.data('id', id);
+            var ids = $target.attr('data-ids');
+            $modal.data('ids', ids);
             $('#sendModal').css('margin-top', $(window).height() / 2 - 180)
             $modal.modal('show');
             var $name = $modal.find('input[name="name"]');
@@ -199,40 +248,13 @@
             }, 800);
         });
 
-        var $sendStatus = $('');
 
-        //进行发货
-        function sendGift(ids, index){
-            if(ids[index]){
-                var id = ids[index];
-            }else{//全部发货完成
-                $.Iwami.showTip('发货成功！', 2000, 'success');
-                $modal.modal('hide');
-                setTimeout(function(){
-                    loadList();
-                }, 1000);
-                return;
-            }
-            $modal.find('.j_status_ctn').html('&nbsp;&nbsp;&nbsp;正在发货第' + (index + 1) + '个礼品');
-            $.post($.Iwami.rootUri + '/client/MOD/exch.ajax', {
-                adminid: $.Iwami.login.getUserId(),
-                id: id,
-                name: $modal.find('select[name="name"]').val(),
-                no: $modal.find('input[name="no"]').val()
-            }, function(res){
-                if(res.status != 0){
-                    $.Iwami.showTip('礼品'+ id +'发货失败，请稍后再试', 2000, 'warning');
-                }else{
-                    sendGift(ids, index+1);
-                }
-            }, 'json');
-        }
 
 
         $modal.find('.btn-primary').click(function(e){
             $.post($.Iwami.rootUri + '/client/MOD/exch.ajax', {
                 adminid: $.Iwami.login.getUserId(),
-                id: $modal.data('id'),
+                ids: $modal.data('ids'),
                 name: $modal.find('input[name="name"]').val(),
                 no: $modal.find('input[name="no"]').val()
             }, function(res){
@@ -244,8 +266,39 @@
                     loadList();
                 }
             }, 'json');
+        });
 
 
+        //发消息
+        var $msgModal = $('#myMsgModal');
+
+
+        $('#list').delegate('.j_btn_sendmsg', 'click', function(e){
+            e.preventDefault();
+            var $target = $(this);
+            var userId = $target.closest('tr').attr('data-userid');
+            $msgModal.data('userid', userId);
+            $('#sendMsgModal').css('margin-top', $(window).height() / 2 - 180)
+            $msgModal.modal('show');
+            setTimeout(function(){
+                $msgModal.find('input[name="message"]')[0].focus();
+            }, 500);
+        });
+
+
+        $msgModal.find('.btn-primary').click(function(e){
+            $.post($.Iwami.rootUri + '/client/PUSH/user.ajax', {
+                adminid: $.Iwami.login.getUserId(),
+                userid: $msgModal.data('userid'),
+                msg: $msgModal.find('input[name="message"]').val()
+            }, function(res){
+                if(res.status != 0){
+                    $.Iwami.showTip('发送失败，请稍后再试', 2000, 'warning');
+                }else{
+                    $.Iwami.showTip('发送成功！', 2000, 'success');
+                    $msgModal.modal('hide');
+                }
+            }, 'json');
         });
     })();
 

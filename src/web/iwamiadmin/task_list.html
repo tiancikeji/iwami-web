@@ -115,8 +115,9 @@
 
         <tr data-taskid="<%=item.taskid%>">
             <td class="iwami-list-op">
+                <div class="break-all" style="width:3em;">
                 <a href="task_add.html?form_edit_mode=1<%for(var name in item){%>&form_<%=name%>=<%:u=item[name]%><%}%>"
-                   target="_blank">
+                   >
                     编辑
                 </a>
                 <%if(item.isdel == 0){%>
@@ -127,23 +128,24 @@
                 <a href="#" class="j_btn_del j_btn_op">
                     删除
                 </a>
+                </div>
             </td>
             <td><%=item.taskid%></td>
-            <td><%=item.name%></td>
-            <td><%=['','普通','红包','金榜','分享','线下'][item.type]%></td>
-            <td><%=['','后台','前台','注册','分享'][item.attr]%></td>
-            <td><%=item.startTime%></td>
-            <td><%=item.endTime%></td>
-            <td class="text-right"><%=item.maxPrize%></td>
-            <td class="text-right"><%=item.currentPrize%></td>
-            <td class="text-right"><%=item.leftPrize%></td>
-            <td class="text-right"><%=item.time%></td>
-            <td class="text-right"><%=item.prize%></td>
-            <td><div style="width:10em;word-break: break-all;"><%=item.intr%></div></td>
-            <td><div style="width:10em;word-break: break-all;"><%=item.appintr%></div></td>
-            <td><a href="<%=item.url%>" target="_blank"><%=item.packageName%>&nbsp;</a></td>
-            <td><a href="<%=item.iconSmall%>" target="_blank">查看图片</a></td>
-            <td><a href="<%=item.iconBig%>" target="_blank">查看图片</a></td>
+            <td><div class="break-all" style="width:5em;"><%=item.name%></div></td>
+            <td><div class="break-all" style="width:3em;"><%=['','普通','红包','金榜','分享','线下'][item.type]%></div></td>
+            <td><div class="break-all" style="width:3em;"><%=['','后台','前台','注册','分享'][item.attr]%></div></td>
+            <td><div class="break-all" style="width:6em;"><%=item.startTime%></div></td>
+            <td><div class="break-all" style="width:6em;"><%=item.endTime%></div></td>
+            <td class="text-right"><div class="break-all" style="width:4em;"><%=item.maxPrize%></div></td>
+            <td class="text-right"><div class="break-all" style="width:5em;"><%=item.currentPrize%></div></td>
+            <td class="text-right"><div class="break-all" style="width:5em;"><%=item.leftPrize%></div></td>
+            <td class="text-right"><div class="break-all" style="width:5em;"><%=item.time%></div></td>
+            <td class="text-right"><div class="break-all" style="width:4em;"><%=item.prize%></div></td>
+            <td><div style="width:10em;word-break: break-all;"><%=item.intr%></div></div></td>
+            <td><div style="width:10em;word-break: break-all;"><%=item.appintr%></div></div></td>
+            <td><div class="break-all" style="width:5em;"><a href="<%=item.url%>" target="_blank"><%=item.packageName%>&nbsp;</a></div></td>
+            <td><div class="break-all" style="width:5em;"><a href="<%=item.iconSmall%>" target="_blank">查看图片</a></div></td>
+            <td><div class="break-all" style="width:5em;"><a href="<%=item.iconBig%>" target="_blank">查看图片</a></div></td>
 
         </tr>
         <%}%>

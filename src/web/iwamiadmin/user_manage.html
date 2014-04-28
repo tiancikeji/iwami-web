@@ -12,7 +12,7 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
             <form class="navbar-form navbar-left" role="search" id="postForm">
                 <div class="form-group">
-                    <input type="text" name="key" class="form-control" placeholder="输入用户ID或手机号进行搜索">
+                    <input type="text" name="key" class="form-control" placeholder="输入用户ID或手机号进行搜索" size="30">
                 </div>
                 <button type="submit" class="btn btn-default">搜索用户</button>
             </form>
@@ -26,8 +26,8 @@
         <table class="table table-bordered table-striped">
             <thead>
             <tr>
-                <th>操作</th>
-                <th>用户ID</th>
+                <th><div class="break-all" style="width: 4em;">操作</div></th>
+                <th><div class="break-all" style="width: 2em;">ID</div></th>
                 <th>手机号</th>
                 <th>姓名</th>
                 <th>性别</th>
@@ -47,28 +47,28 @@
                 <%for(i = 0; i < data.length; i++){%>
                     <%var item = data[i]%>
                     <tr data-userid="<%=item.userid%>">
-                        <th>
-                            <a href="#" class="btn btn-primary btn-lg j_btn_sendmsg">
-                                发送消息
-                            </a><br /><br />
-                            <a class="btn btn-primary btn-lg" href="user_add.html?form_edit_mode=1<%for(var name in item){%>&form_<%=name%>=<%:u=item[name]%><%}%>">
+                        <td>
+                            <a href="#" class="break-all j_btn_sendmsg" style="width: 4em;">
+                                发消息
+                            </a>
+                            <a class="" href="user_add.html?form_edit_mode=1<%for(var name in item){%>&form_<%=name%>=<%:u=item[name]%><%}%>">
                                 编辑
                             </a>
-                        </th>
-                        <th><%=item.userid%></th>
-                        <th><%=item.cellPhone%></th>
-                        <th><%=item.username%></th>
-                        <th><%=['帅哥','美女'][item.gender]%></th>
-                        <th><%=item.age%></th>
-                        <th><%=item.job%></th>
-                        <th><%=item.currentPrize%></th>
-                        <th><%=item.lastAddress%></th>
-                        <th><%=item.lastBankNo%></th>
-                        <th><%=item.lastBankName%></th>
-                        <th><%=item.lastAlipayAccount%></th>
-                        <th><%=item.createTime%></th>
-                        <th><%=item.addTime%></th>
-                        <th><%=item.lastLoginTime%></th>
+                        </td>
+                        <td><%=item.userid%></td>
+                        <td><div class="break-all" style="width:7em;"><%=item.cellPhone%></div></td>
+                        <td><div class="break-all" style="width:3em;"><%=item.username%></div></td>
+                        <td><div class="break-all" style="width:3em;"><%=['帅哥','美女'][item.gender]%></div></td>
+                        <td><div class="break-all" style="width:3em;"><%=item.age%></div></td>
+                        <td><div class="break-all" style="width:5em;"><%=item.job%></div></td>
+                        <td><div class="break-all" style="width:5em;"><%=item.currentPrize%></div></td>
+                        <td><div class="break-all" style="width:10em;"><%=item.lastAddress%></div></td>
+                        <td><div class="break-all" style="width:10em;"><%=item.lastBankNo%></div></td>
+                        <td><div class="break-all" style="width:7em;"><%=item.lastBankName%></div></td>
+                        <td><div class="break-all" style="width:6em;"><%=item.lastAlipayAccount%></div></td>
+                        <td><div class="break-all" style="width:6em;"><%=item.createTime%></div></td>
+                        <td><div class="break-all" style="width:6em;"><%=item.addTime%></div></td>
+                        <td><div class="break-all" style="width:7em;"><div class="break-all" style="width:6em;"><%=item.lastLoginTime%></div></div></td>
                     </tr>
                 <%}%>
             </tbody>

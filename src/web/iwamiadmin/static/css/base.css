@@ -7,6 +7,16 @@ form .input-inline{
     display: inline;
     width: auto;
 }
+.break-all{
+    display: block;
+    word-break: break-all;
+}
+.th,.td{
+    font-size: 12px;
+}
+.th{
+    text-align: center;
+}
 .iwami-input-group{
     padding: 5px;
 }

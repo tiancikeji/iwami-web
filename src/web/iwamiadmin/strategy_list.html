@@ -42,6 +42,7 @@
                 <th>小图</th>
                 <th>焦点图</th>
                 <th>被赞次数</th>
+                <th>浏览次数</th>
                 <th>默认排序</th>
                 <th>操作</th>
             </tr>
@@ -50,14 +51,15 @@
                 <%for(i = 0; i < data.length; i++){%>
                     <%var item = data[i]%>
                     <tr data-id="<%=item.id%>">
-                        <td><%=item.id%></td>
-                        <td><%=item.name%></td>
-                        <td><%=item.intr%></td>
-                        <td><a href="<%=item.iconSmall%>" target="_blank">查看图片</a></td>
-                        <td><a href="<%=item.iconBig%>" target="_blank">查看图片</a></td>
-                        <td><%=item.rate%></td>
-                        <td><%=item.rank%></td>
-                        <td>
+                        <td><div class="break-all" style="width:3em;"><%=item.id%></div></td>
+                        <td><div class="break-all" style="width:10em;"><%=item.name%></div></td>
+                        <td><div class="break-all" style="width:10em;"><%=item.intr%></div></td>
+                        <td><div class="break-all" style="width:4em;"><a href="<%=item.iconSmall%>" target="_blank">查看图片</a></div></td>
+                        <td><div class="break-all" style="width:4em;"><a href="<%=item.iconBig%>" target="_blank">查看图片</a></div></td>
+                        <td><div class="break-all" style="width:5em;"><%=item.rate%></div></td>
+                        <td><div class="break-all" style="width:4em;"><%=item.skim%></div></td>
+                        <td><div class="break-all" style="width:4em;"><%=item.rank%></div></td>
+                        <td><div class="break-all" style="width:14em;">
                             <a href="strategy_add.html?form_edit_mode=1<%for(var name in item){%>&form_<%=name%>=<%:u=item[name]%><%}%>"
                                >
                                 编辑
@@ -70,12 +72,12 @@
                             </a>
                             <a href="#" class="j_btn_del">
                                 删除
-                            </a><br />
+                            </a>
                             <a href="strategy_info_list.html?form_strategyid=<%:u=item.id%>&form_name=<%:u=item.name%>"
                                target="_blank">
                                 详情管理
                             </a>
-                        </td>
+                        </div></td>
                     </tr>
                 <%}%>
             </tbody>

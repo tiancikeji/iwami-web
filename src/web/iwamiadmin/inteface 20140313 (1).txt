@@ -1,0 +1,938 @@
+/*****************
+/status:0		返回正常
+/status:400	系统错误
+/status:500	登录过期，需要跳转到登录界面
+/status:600	权限不够
+/status:1000 软件使用权限过期，提供一个过期的页面/expire.html，里面就写“软件过期了, 请联系******进行购买”
+/
+/需要提供一个/error.html：提示下载出错
+/***********************
+
+
+用户权限的解释
+用户权限，在用户权限功能中，对每级的用户进行登陆密码确认。只有相应权限的用户名及密码全部正确之后才能使用软件。
+     1 超级管理员：此用户为品傲光电的技术人员使用，超级管理员的权限为最大，可以操作任何与软件有关个操作。在平面视图中，能够使用“仪器-通道”的查看方式，进行软件调试。超级管理员可以对系统管理员的用户进行增加删除。
+     2 系统管理员：此监测厂区的技术管理人员使用，具有对班长用户，操作工用户进行增加/删除/修改的功能。可以使用软件中常规功能：平面视图中的“监测区域方式”，报警日志，运行日志，历史趋势数据查询导出功能，报警历史查询。报警恢复，确认，消音功能。分区报警声音设定。
+     3 班长：此用户为监测厂区监控室中级管理人员。可以使用软件中常规功能：平面视图中的“监测区域方式”，报警日志，运行日志，历史趋势数据查询导出功能，报警历史查询。报警恢复功能。报警确认功能。报警消音功能
+     4 操作工：此用户为监测厂区监控室的工作人员。可以使用软件中常规功能：平面视图中的“监测区域方式”，报警日志，运行日志，历史趋势数据查询功能，报警消音功能。报警确认功能。
+
+
+
+1. 实时监测
+	1.1 监测区域
+		1.1.1 区域列表
+			url：/monitor/areas
+			输入参数：
+				userid: long 当前用户id
+			输出结果：需要考虑层级结构，数据返回的children是下一层级数据
+				{
+					status:0
+					data:[
+						{
+							id:唯一id
+							name：分区名称
+							level：第几层：0-厂区，1-缆沟，2-分区，暂时不显示
+							image：图片，用户可以上传，上传的内容我这边需要解析联调一下
+							parent：父级id
+							children：隶属于这个数据的子数据（目前就三层）
+						},
+						...
+						
+					]
+				}
+		1.1.2 平面视图 - 默认显示平面视图
+					使用1.1.1区域列表中的image显示
+					
+					***************平面视图功能中，在上传上平面示意图后，定义为4*4格，每个格代表不同的区域，若某个格代表的区域有报警产生或故障产生时，在平面视图中使用某中指示部件变色（红色或黄色）来指示相应的状态（在此显示的为平面视图中的第一级图），点击相应的格，转换到该报警/故障区域（第二级图中），在此画面中显示该监测区域的示意图及该监测区域的位置说明，状态说明。
+					
+		1.1.3 数据报表(http://zaoke.me/dts/monitor/area/data?userid=1&id=1&time=-1)
+			使用highcharts展示该区域的最高温度，最低温度，平均温度的趋势曲线
+			图中数据根据时间不短累积
+			
+			横坐标：时间
+			纵坐标：温度
+			图中曲线：最高温度，最低温度，平均温度
+			
+			url：/monitor/area/data
+			输入参数：
+				userid: long 当前用户id
+				id：int 区域唯一id
+				time：long 上次从服务器获得数据的时间，以ms为单位；第一次为-1
+			输出结果：-- 如果从time开始没有最新的数据，则输出结果为空
+				{
+					status:0
+					interval:long 自动刷新频率（多少秒一次）
+					data: {
+							max：double 最高温度
+							min：double 最低温度
+							avg：平均温度
+							time：long 时间
+							alarmIdxs：1 - 16 报警视图上的位置（仅第一级有）；当有此字段时，需要按照1.1.2在平面视图进行报警显示
+							[
+								int,
+								int,
+							]
+							alarmIds：long 报警的区域id（仅第一级有）；当有此字段时，当用户点击平面视图上对于那个的alarmIndex时，会自动跳转到此id对应的平面视图，且获取此alarmId对应的/monitor/area/data数据
+							[
+								long,
+								long
+							]
+							alarmName：String 报警区域说明；此字段仅最后一级时会有
+							alarmType：int 报警类型(1预警，2火警，3差温报警，4温升速率报警，5低温故障，6高温故障，7斯托克斯故障，8反斯托克斯故障，9数据存储溢出")；此字段仅最后一级时会有
+						}
+		1.1.4 左下角 - 监测名称，最高温度，最低温度，平均温度
+			监测名称是1.1.1的name
+			最高温度，最低温度和平均温度是1.1.3的max，min和avg
+		1.1.5 报警信息（用户可以选择操作：确认，消音和复位三种的一种，但是确认->消音->复位是不可逆的，e.g.用户选择了复消音，可要继续选择复位，但是就不能选择确认了；复位是终极状态，一旦选择了复位所有的操作都不可以操作了）
+			url：/monitor/area/alarm
+			输入参数：
+				userid: long 当前用户id
+				id：long 区域唯一id
+			输出结果：
+				{
+					status:0
+					data:[
+						{
+							id: long 报警id
+							type：int 报警类型：1预警，2火警，3差温报警，4温升速率报警，5低温故障，6高温故障，7斯托克斯故障，8反斯托克斯故障，9数据存储溢出
+							machineName：String 机器名称
+							channelName"：String 通道名称
+							areaName：String 区域名称
+							length：通道距离
+							alarmName：报警区域
+							light：灯号
+							relay：火警继电器
+							relay1：预警继电器
+							voice：报警声音
+							temperature：实际温度
+							temperaturePre：预设报警温度
+							status：int 状态值 0新增，1报警，2确认，3消音，4消音过，5复位，6复位过
+							addTime：String 添加时间
+							lastModTime：String 上次更新时间
+							lastModUserid：long 上次更新人
+							history:[ // history紧跟着每个报警记录且比报警记录右缩进（代表他们有层级关系），默认是收起来的（用户看不到），用户可以选择+号，选择打开所有的报警历史
+								{
+									operation：int 用户操作 2确认，3消音，5复位
+									lastModTime：String 操作时间
+									lastModUserid：long 操作人
+								}
+							]
+						},
+						...
+						
+					]
+				}
+	1.2 仪器
+		1.2.1 仪器列表
+			url：/monitor/channels
+			输入参数：
+				userid: long 当前用户id
+			输出结果：需要考虑层级结构，第一层是机器列表，第二层是通道列表
+				{
+					status:0
+					data:[
+						{
+							id:机器唯一id
+							name：机器名称
+							channels：[ -- 通道列表
+								{
+									id：通道唯一id
+									name：通道名称
+								},
+								...
+							]
+						},
+						...
+						
+					]
+				}
+		1.2.2 平面视图 - 仪器没有平面视图，直接显示数据报表
+		1.2.3 数据报表
+			使用highcharts展示该区域的温度、stock和反stock数据（三幅图）
+			图中数据显示最新的数据，不进行累加
+			
+			第一个图
+				横坐标：距离
+				纵坐标：温度
+				图中曲线：不同通道
+			第二个图
+				横坐标：距离
+				纵坐标：stock数据
+				图中曲线：不同通道
+			第三个图
+				横坐标：距离
+				纵坐标：反stock数据
+				图中曲线：不同通道
+			
+			1.2.3.1 选中机器时接口(http://zaoke.me/dts/monitor/machine/data?userid=1&id=1&time=-1)
+									url：/monitor/machine/data
+									输入参数：
+										userid: long 当前用户id
+										id：int 机器唯一id
+										time：long 上次从服务器获得数据的时间，以ms为单位；第一次为-1
+									输出结果：
+										{
+											status:0
+											interval:long 自动刷新频率（多少秒一次）
+											data: {
+													max：double 最高温度
+													min：double 最低温度
+													avg：平均温度
+													time：long 时间
+													tems：[
+														{
+															name：String 通道名称
+															data：[
+																{
+																	length: int 长度
+																	temp:double 温度
+																},
+																...
+															]
+														}
+													]
+													stocks：[
+														{
+															name：String 通道名称
+															data:[
+																{
+																	length: int 长度
+																	stock:double
+																},
+																...
+															]
+														}
+													]
+													unstocks：[
+														{
+															name：String 通道名称
+															data:[
+																{
+																	length: int 长度
+																	unstock:double 
+																},
+																...
+															],
+														}
+													]
+												}
+			
+			1.2.3.2 选中通道时接口(http://zaoke.me/dts/monitor/channel/data?userid=1&id=1&time=-1)
+									url：/monitor/channel/data
+									输入参数：
+										userid: long 当前用户id
+										id：long 通道唯一id
+										time：long 上次从服务器获得数据的时间，以ms为单位；第一次为-1
+									输出结果：
+										{
+											status:0
+											interval:long 自动刷新频率（多少秒一次）
+											data: {
+													max：double 最高温度
+													min：double 最低温度
+													avg：平均温度
+													time：long 时间
+													tems：[
+														{
+															name：String 通道名称
+															data：[
+																{
+																	length: int 长度
+																	temp:double 温度
+																},
+																...
+															]
+														}
+													]
+													stocks：[
+														{
+															name：String 通道名称
+															data:[
+																{
+																	length: int 长度
+																	stock:double
+																},
+																...
+															]
+														}
+													]
+													unstocks：[
+														{
+															name：String 通道名称
+															data:[
+																{
+																	length: int 长度
+																	unstock:double 
+																},
+																...
+															],
+														}
+													]
+												}
+		1.2.4 监测名称，最高温度，最低温度，平均温度
+			监测名称是1.2.1对应机器/通道的name
+			最高温度，最低温度和平均温度是1.2.3对应机器/通道的max，min和avg
+		1.2.5 报警信息（用户可以选择操作：确认，消音和复位三种的一种，但是确认->消音->复位是不可逆的，e.g.用户选择了复位，就不能选择消音，一旦选择了复位所有的操作都不可以操作了）
+			1.2.5.1 选中机器时接口
+				url：/monitor/machine/alarm
+				输入参数：
+					userid: long 当前用户id
+					id：int 机器唯一id
+				输出结果：
+					{
+						status:0
+						data:[
+							{
+								id: long 报警id
+								type：int 报警类型：1预警，2火警，3差温报警，4温升速率报警，5低温故障，6高温故障，7斯托克斯故障，8反斯托克斯故障，9数据存储溢出
+								machineName：String 机器名称
+								channelName"：String 通道名称
+								areaName：String 区域名称
+								length：通道距离
+								alarmName：报警区域
+								light：灯号
+								relay：火警继电器
+								relay1：预警继电器
+								voice：报警声音
+								temperature：实际温度
+								temperaturePre：预设报警温度
+								status：int 状态值 0新增，1报警，2确认，3消音，4消音过，5复位，6复位过
+								addTime：String 添加时间
+								lastModTime：String 上次更新时间
+								lastModUserid：long 上次更新人
+								history:[
+									{
+										operation：int 用户操作 2确认，3消音，5复位
+										lastModTime：String 操作时间
+										lastModUserid：long 操作人
+									}
+								]
+							},
+							...
+							
+						]
+					}
+										
+			
+			1.2.5.2 选中通道时接口
+				url：/monitor/channel/alarm
+				输入参数：
+					userid: long 当前用户id
+					id：long 通道唯一id
+				输出结果：
+					{
+						status:0
+						data:[
+							{
+								id: long 报警id
+								type：int 报警类型：1预警，2火警，3差温报警，4温升速率报警，5低温故障，6高温故障，7斯托克斯故障，8反斯托克斯故障，9数据存储溢出
+								machineName：String 机器名称
+								channelName"：String 通道名称
+								areaName：String 区域名称
+								length：通道距离
+								alarmName：报警区域
+								light：灯号
+								relay：火警继电器
+								relay1：预警继电器
+								voice：报警声音
+								temperature：实际温度
+								temperaturePre：预设报警温度
+								status：int 状态值 0新增，1报警，2确认，3消音，4消音过，5复位，6复位过
+								addTime：String 添加时间
+								lastModTime：String 上次更新时间
+								lastModUserid：long 上次更新人
+								history:[
+									{
+										operation：int 用户操作 2确认，3消音，5复位
+										lastModTime：String 操作时间
+										lastModUserid：long 操作人
+									}
+								]
+							},
+							...
+							
+						]
+					}
+										
+
+2. 历史查询
+	2.1 监测区域
+		2.1.1 区域列表
+			url：/report/areas
+			输入参数：
+				userid: long 当前用户id
+			输出结果：需要考虑层级结构，数据返回的children是下一层级数据
+				{
+					status:0
+					data:[
+						{
+							id:唯一id
+							name：分区名称
+							level：第几层：0-厂区，1-缆沟，2-分区，暂时不显示
+							image：图片，用户可以上传，上传的内容我这边需要解析联调一下
+							parent：父级id
+							children：隶属于这个数据的子数据（目前就三层）
+						},
+						...
+						
+					]
+				}
+		2.1.2 平面视图 - 默认显示平面视图
+					使用1.1.1区域列表中的image显示
+					
+		2.1.3 数据报表 (http://zaoke.me/dts/report/area/data?userid=1&id=1&start=2013-04-11%2000:00:00&end=2014-04-11%2000:00:00)
+			使用highcharts展示该区域的温度和stock、反stock数据的趋势曲线（三个图）
+			
+			第一个图
+				横坐标：时间
+				纵坐标：温度
+				图中曲线：通道-距离两个维度的组合体
+			第二个图
+				横坐标：时间
+				纵坐标：stock数据
+				图中曲线：通道-距离两个维度的组合体
+			第三个图
+				横坐标：时间
+				纵坐标：反stock数据
+				图中曲线：通道-距离两个维度的组合体
+			
+			url：/report/area/data
+			输入参数：
+				userid: long 当前用户id
+				id：long 区域唯一id
+				start：String yyyy-MM-dd HH:mm:ss 开始时间
+				end：String yyyy-MM-dd HH:mm:ss 开始时间
+			输出结果：
+				{
+					status:0
+					data: {
+							max：double 最高温度
+							min：double 最低温度
+							avg：平均温度
+							tems：[
+									{
+										name：String 机器+通道+距离
+										data: [
+											{
+												temp:double 温度
+												time:String yyyy-MM-dd HH:mm:ss 时间
+											}
+										]
+									},
+									...
+								],
+								stocks:[
+									{
+										name：String 机器+通道+距离
+										data: [
+											{
+												stock:double 温度
+												time:String yyyy-MM-dd HH:mm:ss 时间
+											}
+										]
+									},
+									...
+								],
+								unstocks:[
+									{
+										name：String 机器+通道+距离
+										data: [
+											{
+												unstock:double 温度
+												time:String yyyy-MM-dd HH:mm:ss 时间
+											}
+										]
+									},
+									...
+								],
+						}
+					
+		2.1.4 数据报表下载  -- 班长，系统管理员，超级管理员能看到下载按钮，操作工看不到此按钮
+			url：/report/area/download
+			输入参数：
+				userid: long 当前用户id
+				id：long 区域唯一id
+				start：String yyyy-MM-dd HH:mm:ss 开始时间
+				end：String yyyy-MM-dd HH:mm:ss 开始时间
+			输出结果：
+				文件输出
+		2.1.5 左下角 - 监测名称，最高温度，最低温度，平均温度
+			监测名称是2.1.1的name
+			最高温度，最低温度和平均温度是2.1.3的max，min和avg
+		2.1.6 报警日志：（用户可以选择操作：确认，消音和复位三种的一种，但是确认->消音->复位是不可逆的，e.g.用户选择了复位，就不能选择消音，一旦选择了复位所有的操作都不可以操作了）
+			url：/report/area/alarm
+			输入参数：
+				userid: long 当前用户id
+				id：long 区域唯一id
+			输出结果：
+				{
+					status:0
+					data:[
+						{
+							id: long 报警id
+							type：int 报警类型：1预警，2火警，3差温报警，4温升速率报警，5低温故障，6高温故障，7斯托克斯故障，8反斯托克斯故障，9数据存储溢出
+							machineName：String 机器名称
+							channelName"：String 通道名称
+							areaName：String 区域名称
+							length：通道距离
+							alarmName：报警区域
+							light：灯号
+							relay：火警继电器
+							relay1：预警继电器
+							voice：报警声音
+							temperature：实际温度
+							temperaturePre：预设报警温度
+							status：int 状态值 0新增，1报警，2确认，3消音，4消音过，5复位，6复位过
+							addTime：String 添加时间
+							lastModTime：String 上次更新时间
+							lastModUserid：long 上次更新人
+							history:[
+								{
+									operation：int 用户操作 2确认，3消音，5复位
+									lastModTime：String 操作时间
+									lastModUserid：long 操作人
+								}
+							]
+						},
+						...
+						
+					]
+				}
+	2.2 仪器
+		2.2.1 仪器列表
+			url：/report/channels
+			输入参数：
+				userid: long 当前用户id
+			输出结果：需要考虑层级结构，第一层是机器列表，第二层是通道列表
+				{
+					status:0
+					data:[
+						{
+							id:机器唯一id
+							name：机器名称
+							channels：[ -- 通道列表
+								{
+									id：通道唯一id
+									name：通道名称
+								},
+								...
+							]
+						},
+						...
+						
+					]
+				}
+		2.2.3 数据报表
+			使用highcharts展示该区域的温度的趋势曲线
+			
+			
+			第一个图
+				横坐标：时间
+				纵坐标：温度
+				图中曲线：通道-距离两个维度的组合体
+			第二个图
+				横坐标：时间
+				纵坐标：stock数据
+				图中曲线：通道-距离两个维度的组合体
+			第三个图
+				横坐标：时间
+				纵坐标：反stock数据
+				图中曲线：通道-距离两个维度的组合体
+			
+			2.2.3.1 选中机器时接口(http://zaoke.me/dts/report/machine/data?userid=1&id=1&start=2013-04-11%2000:00:00&end=2014-04-11%2000:00:00)
+									url：/report/machine/data
+									输入参数：
+										userid: long 当前用户id
+										id：long 机器唯一id
+										start：String yyyy-MM-dd HH:mm:ss 开始时间
+										end：String yyyy-MM-dd HH:mm:ss 开始时间
+									输出结果：
+										{
+											status:0
+											data: {
+													max：double 最高温度
+													min：double 最低温度
+													avg：平均温度
+													tems：[
+														{
+															name：String 通道+距离
+															data: [
+																{
+																	temp:double 温度
+																	time:String yyyy-MM-dd HH:mm:ss 时间
+																}
+															]
+														},
+														...
+													],
+													stocks:[
+														{
+															name：String 通道+距离
+															data: [
+																{
+																	stock:double 温度
+																	time:String yyyy-MM-dd HH:mm:ss 时间
+																}
+															]
+														},
+														...
+													],
+													unstocks:[
+														{
+															name：String 通道+距离
+															data: [
+																{
+																	unstock:double 温度
+																	time:String yyyy-MM-dd HH:mm:ss 时间
+																}
+															]
+														},
+														...
+													],
+												}
+			
+			2.2.3.2 选中通道时接口(http://zaoke.me/dts/report/channel/data?userid=1&id=1&start=2013-04-11%2000:00:00&end=2014-04-11%2000:00:00)
+									url：/report/channel/data
+									输入参数：
+										userid: long 当前用户id
+										id：long 通道唯一id
+										start：String yyyy-MM-dd HH:mm:ss 开始时间
+										end：String yyyy-MM-dd HH:mm:ss 开始时间
+									输出结果：
+										{
+											status:0
+											data: {
+													max：double 最高温度
+													min：double 最低温度
+													avg：平均温度
+													tems：[
+														{
+															name：String 距离
+															data: [
+																{
+																	temp:double 温度
+																	time:String yyyy-MM-dd HH:mm:ss 时间
+																}
+															]
+														},
+														...
+													],
+													stocks:[
+														{
+															name：String 距离
+															data: [
+																{
+																	stock:double 温度
+																	time:String yyyy-MM-dd HH:mm:ss 时间
+																}
+															]
+														},
+														...
+													],
+													unstocks:[
+														{
+															name：String 距离
+															data: [
+																{
+																	unstock:double 温度
+																	time:String yyyy-MM-dd HH:mm:ss 时间
+																}
+															]
+														},
+														...
+													],
+												}
+												
+		2.2.4 数据报表下载  -- 超级管理员能看到下载按钮，班长，系统管理员，操作工看不到仪器
+			2.2.4.1 选中机器时接口
+				url：/report/machine/download
+				输入参数：
+					userid: long 当前用户id
+					id：long 机器唯一id
+					start：String yyyy-MM-dd HH:mm:ss 开始时间
+					end：String yyyy-MM-dd HH:mm:ss 开始时间
+				输出结果：
+					文件输出
+			
+			2.2.4.2 选中通道时接口
+				url：/report/channel/download
+				输入参数：
+					userid: long 当前用户id
+					id：long 通道唯一id
+					start：String yyyy-MM-dd HH:mm:ss 开始时间
+					end：String yyyy-MM-dd HH:mm:ss 开始时间
+				输出结果：
+					文件输出
+		2.2.5 监测名称，最高温度，最低温度，平均温度
+			监测名称是2.2.1对应机器/通道的name
+			最高温度，最低温度和平均温度是2.2.3对应机器/通道的max，min和avg
+		2.2.6 报警日志：（用户可以选择操作：确认，消音和复位三种的一种，但是确认->消音->复位是不可逆的，e.g.用户选择了复位，就不能选择消音，一旦选择了复位所有的操作都不可以操作了）
+			2.2.6.1 选中机器时接口
+				url：/report/machine/alarm
+				输入参数：
+					userid: long 当前用户id
+					id：int 机器唯一id
+				输出结果：
+					{
+						status:0
+						data:[
+							{
+								id: long 报警id
+								type：int 报警类型：1预警，2火警，3差温报警，4温升速率报警，5低温故障，6高温故障，7斯托克斯故障，8反斯托克斯故障，9数据存储溢出
+								machineName：String 机器名称
+								channelName"：String 通道名称
+								areaName：String 区域名称
+								length：通道距离
+								alarmName：报警区域
+								light：灯号
+								relay：火警继电器
+								relay1：预警继电器
+								voice：报警声音
+								temperature：实际温度
+								temperaturePre：预设报警温度
+								status：int 状态值 0新增，1报警，2确认，3消音，4消音过，5复位，6复位过
+								addTime：String 添加时间
+								lastModTime：String 上次更新时间
+								lastModUserid：long 上次更新人
+								history:[
+									{
+										operation：int 用户操作 2确认，3消音，5复位
+										lastModTime：String 操作时间
+										lastModUserid：long 操作人
+									}
+								]
+							},
+							...
+							
+						]
+					}
+										
+			
+			2.2.6.2 选中通道时接口
+				url：/report/channel/alarm
+				输入参数：
+					userid: long 当前用户id
+					id：long 通道唯一id
+				输出结果：
+					{
+						status:0
+						data:[
+							{
+								id: long 报警id
+								type：int 报警类型：1预警，2火警，3差温报警，4温升速率报警，5低温故障，6高温故障，7斯托克斯故障，8反斯托克斯故障，9数据存储溢出
+								machineName：String 机器名称
+								channelName"：String 通道名称
+								areaName：String 区域名称
+								length：通道距离
+								alarmName：报警区域
+								light：灯号
+								relay：火警继电器
+								relay1：预警继电器
+								voice：报警声音
+								temperature：实际温度
+								temperaturePre：预设报警温度
+								status：int 状态值 0新增，1报警，2确认，3消音，4消音过，5复位，6复位过
+								addTime：String 添加时间
+								lastModTime：String 上次更新时间
+								lastModUserid：long 上次更新人
+								history:[
+									{
+										operation：int 用户操作 2确认，3消音，5复位
+										lastModTime：String 操作时间
+										lastModUserid：long 操作人
+									}
+								]
+							},
+							...
+							
+						]
+					}
+	2.7 运行日志(http://zaoke.me/dts//log/history?userid=1&start=2013-04-11%2000:00:00&end=2014-04-11%2000:00:00)
+		url：/log/history
+		输入参数：
+			userid: long 当前用户id
+			start：String yyyy-MM-dd HH:mm:ss 开始时间
+			end：String yyyy-MM-dd HH:mm:ss 开始时间
+		输出结果：
+			{
+				status:0
+				data: [
+					{
+						id: int 序号
+						type: int 1-web系统启动，2-web系统关闭，3-用户登录，4-用户登出，5-数据采集启动，6-数据采集关闭
+						value: 用户
+						source: String 机器MAC地址
+						time: String yyyy-MM-dd HH:mm:ss 时间
+					}
+				]
+
+3. 项目信息(http://zaoke.me/dts/project/info?userid=1)
+		(
+			图片：/assets/project.jpg
+			文本：/assets/project.txt
+		)
+		url：/project/info
+		输入参数：
+			userid: long 当前用户id
+		输出结果：
+			{
+				status:0
+				data: [
+					{
+						image: String 项目信息的图片
+						content: 项目信息文本
+					}
+				]
+
+4. 帮助手册 - /assets/help.chm 提示用户下载
+
+5. 用户管理
+	5.1 用户登录
+		url：/login
+		输入参数：
+			name: String 登录用户名
+			password: String 登录密码
+		输出结果：
+			{
+				status:0/500（登录失败）
+				data: 
+					{
+						userid: long 用户id
+						name: String 用户登录名/名称
+						role：int 用户角色：1 超级管理员, 2 系统管理员, 3 班长, 4 操作工
+						right：String 用户权限：从[字符串]低位开始，1   所有其他管理员权限, 2 操作工用户进行增加/删除/修改的功能, 3  班长用户进行增加/删除/修改的功能, 4 分区报警声音设定, 5 实时监测区域, 6 实时报警查询, 7 历史报警查询, 8 历史运行日志, 9 历史监测区域趋势数据查询功能, 10 历史监测区域趋势数据导出功能, 11 报警消音, 12 报警确认, 13 报警恢复
+					}
+			}
+	5.2 用户登出
+		url：/logout
+		输入参数：
+			userid: long 登录用户id
+			password: String 退出密码
+		输出结果：
+			{
+				status:0/400
+					700：复位用户登录失败
+			}
+			
+	5.3 新增用户（只有超级管理员和系统管理员能看到）
+		url：/user/new
+		输入参数：
+			userid: long 登录用户id
+			name: String 登录用户名
+			passwordLogin: String 登录密码
+			passwordLogout: String 退出密码
+			passwordReset: String 复位密码
+			role:int 用户角色 2 系统管理员（只有超级管理员能够看到此选项）, 3 班长, 4 操作工
+			areaIds：String 用,分割，新增用户可以看到的监控区域id列表（前端可以把所有的areas列表列出，前端动态增加/删除可以操作的区域列表）
+		输出结果：
+			{
+				status:0/400/500（登录过期）
+			}
+			
+	5.4 修改用户（只有超级管理员和系统管理员能看到）
+		url：/user/modify
+		输入参数：
+			userid: long 登录用户id
+			id：long 被修改用户id
+			name: String 登录用户名
+			passwordLogin: String 登录密码
+			passwordLogout: String 退出密码
+			passwordReset: String 复位密码
+			role:int 用户角色 2 系统管理员（只有超级管理员能够看到此选项）, 3 班长, 4 操作工
+			areaIds：String 用,分割，新增用户可以看到的监控区域id列表（前端可以把所有的areas列表列出，前端动态增加/删除可以操作的区域列表）
+		输出结果：
+			{
+				status:0/400/500（登录过期）
+			}
+			
+	5.5 删除用户（只有超级管理员和系统管理员能看到）
+		url：/user/delete
+		输入参数：
+			userid: long 登录用户id
+			id：long 被修改用户id
+		输出结果：
+			{
+				status:0/400/500（登录过期）
+			}
+			
+	5.6 用户列表（只有超级管理员和系统管理员能看到）
+		url：/user/list
+		输入参数：
+			userid: long 登录用户id
+		输出结果：
+			{
+				status:0/400/500（登录过期）
+				data: 
+				[
+					{
+						id: long 用户id
+						name: String 用户登录名/名称
+						role：int 用户角色：1 超级管理员, 2 系统管理员, 3 班长, 4 操作工
+						areaIds：[int,int,...]，用户可以看到的监控区域id列表（前端可以把所有的areas列表列出，前端动态增加/删除可以操作的区域列表）
+				},
+					...
+				]
+			}
+
+6. 报警
+	6.1 报警定期获取，前端获得报警数据后，弹出框提示用户（areaName alarmName发生了<type的转义>报警），有两个框用户选择：确认（6.2），消音（6.3）
+		url：/alarm/check
+		输入参数：
+			userid: long 登录用户id
+			time: long 上次查询时间，-1为最新的时间
+			interval:long 自动刷新频率（多少秒一次）
+		输出结果：
+			{
+				status:0/400/500（登录过期）
+				time:long 本次检测报警时间，下次调用时返回
+				data: 
+				[
+					{
+						id: long 报警id
+						type：int 报警类型：1预警，2火警，3差温报警，4温升速率报警，5低温故障，6高温故障，7斯托克斯故障，8反斯托克斯故障，9数据存储溢出
+						areaName：String 区域名称
+						alarmName：报警区域
+					},
+					...
+				]
+			}
+	6.2 确认
+		url：/alarm/notify
+		输入参数：
+			userid: long 登录用户id
+			id: long 报警id
+		输出结果：
+			{
+				status:0/400/500（登录过期）
+			}
+	6.3 消音
+		url：/alarm/mute
+		输入参数：
+			userid: long 登录用户id
+			id: long 报警id
+		输出结果：
+			{
+				status:0/400/500（登录过期）
+			}
+	6.4 复位
+		url：/alarm/reset
+		输入参数：
+			userid: long 登录用户id
+			id: long 报警id
+			
+			loginname：String 复位的用户登录名
+			password：String 复位的用户密码
+		输出结果：
+			{
+				status:0/400/500（登录过期）
+					700：复位用户登录失败
+					600：复位用户没有权限
+			}
+7. 系统自检 - 在参数设置 - 系统设置增加同层级“系统自检”
+	url：/check/hardware
+		输入参数：
+			userid: long 登录用户id
+		输出结果：
+			{
+				status:0/400/500（登录过期）
+			}

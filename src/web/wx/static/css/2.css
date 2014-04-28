@@ -1,0 +1,200 @@
+body{
+    margin: 0 0;
+    padding: 0 0;
+    font-size: 16px;
+    background: #f1f1f1;
+    font-family: 'microsoft yahei', Verdana, Arial, Helvetica, sans-serif;
+    color: #000;
+    position: fixed;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+}
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    text-align: center;
+}
+.page-img-up {
+    position: fixed;
+    bottom: 40px;
+    width: 100%;
+}
+.fakeheader, .header {
+    height: 56px;
+}
+.header {
+    color: #fff;
+    line-height: 56px;
+    font-family: "microsoft yahei";
+    background: url(../images/header-bg.png) repeat-x;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+}
+.header h1 {
+    font-size: 24px;
+}
+.header .header-back {
+    position: absolute;
+    left: 0;
+    top:0;
+    height: 56px;
+    width: 62px;
+    background: url(../images/header-back.png) no-repeat;
+}
+
+.slide-item{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 100%;
+    padding-top: 56px;
+    transition-duration: 1s;
+    -webkit-transition-duration: 1s;
+}
+
+
+/*第5页*/
+.page-5{
+    height: 100%;
+    text-align: center;
+    background: #f1f1f1;
+}
+.page-5 .page-img-up{
+    margin-top: 2.8%;
+}
+.title-5 table{
+    text-align: center;
+    height: 14.164306%;
+    font-size: 16px;
+}
+.title-5 table{
+    width: 100%;
+}
+.title-5 table td{
+    vertical-align: middle;
+    font-size: 2em;
+    padding: .2em;
+}
+.table-5{
+    border: 1px dashed #efc56d;
+    border-top: none ;
+    width: 95%;
+    margin: 0 auto;
+}
+.table-5 th{
+    background: #efb844;
+    padding: .2em 0;
+}
+.table-5 th div{
+    padding: 5px;
+}
+.table-5 tbody tr td{
+    padding: .2em 0;
+    font-size: 0.9em;
+}
+.table-5 tbody tr:nth-child(1n){
+    background: #f0ebe2;
+}
+.table-5 tbody tr:nth-child(2n){
+    background: #dde3eb;
+}
+
+/*我们为你准备的福利页面*/
+.fuli_list{
+    padding: 1em;
+    text-align: left;
+}
+.fuli_list h1{
+    text-align: center;
+}
+.fuli_list p{
+    position: relative;
+    padding: 1em;
+    font-size: 1.2em;
+}
+.fuli_list p span{
+    position: absolute;
+    left: 1px;
+    top: 1.7em;
+    background: #efb844;
+    border-radius: 8px;
+    width: 15px;
+    height: 15px;
+    line-height: 15px;
+    text-align: center;
+    color: #fff;
+    font-size: 14px;
+}
+.join-step{
+    padding: 1em;
+    text-align: center;
+}
+.join-step h1{
+    text-align: center;
+}
+.join-step-hd{
+    margin-top: 1em;
+    /*
+    background: url(../images/bg_join_step.png) center center no-repeat;
+    height: 131px;
+    width: 446px;
+    background-size: cover;
+    margin: 0 auto;
+    margin-top: 2em;*/
+}
+.join-step-bd{
+    font-size: 1.2em;
+    margin-top: 3em;
+    text-align: center;
+}
+.join-qq{
+    text-align: center;
+    font-size: 1.2em;
+}
+
+.join-qq h2{
+    font-size: 1.2em;
+    margin: .5em 0;
+}
+.join-qq p{
+    font-size: .9em;
+}
+.join-split{
+    background: #efb844;
+    height: 4px;
+}
+
+.iwami-about{
+    background: #303337;
+    color: #fff;
+    padding-bottom: 2.5em;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: left;
+}
+.iwami-about-ctn{
+    padding: 1em;
+    padding-bottom: 70px;
+}
+.iwami-about-ctn h3{
+    font-size: 1em;
+}
+.iwami-about-ctn p{
+    font-size: 0.9em;
+}
+.iwami-copyright p{
+    font-size: 0.9em;
+}
+.iwami-about .iwami-copyright{
+    width: 100%;
+    position: absolute;
+    bottom: 70px;
+    text-align: center;
+}

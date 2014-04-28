@@ -130,6 +130,9 @@
                         '<input name="addCurrentPrize" type="text" class="form-control input-inline" size="10" value="0">' +
                         '</div>').prependTo($postForm);*/
                 $('input[name="currentPrize"]').remove();
+                if($.Iwami.getParameter('form_type') == '4'){//分享任务不能修改类型，特殊处理
+                    $('select[name="type"]').replaceWith($('<span>分享任务</span><input type="hidden" name="type" value="4">'));
+                }
             }
             /*
             $postForm.submit(function(e){

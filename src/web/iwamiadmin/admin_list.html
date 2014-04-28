@@ -9,11 +9,24 @@
 <body>
     <!--#include virtual="/iwamiadmin/header.html"-->
 
-    <p>
-        <a class="btn btn-default" href="admin_edit.html">
-            新建运营人员
-        </a>
-    </p>
+
+    <div class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+            <form class="navbar-form navbar-left" role="search" id="postForm">
+                <div class="form-group">
+                    <input type="text" name="key" class="form-control" placeholder="输入用户ID或手机号进行搜索" size="30">
+                </div>
+                <button type="submit" class="btn btn-default">搜索用户</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a class="btn btn-default" href="admin_edit.html">
+                    新建运营人员
+                </a>
+            </form>
+
+        </div>
+    </div>
+
+
     <div class="table-responsive" id="list"></div>
     <!--#include virtual="/iwamiadmin/footer.html"-->
 
@@ -59,14 +72,27 @@
         (function(){
             $.Iwami.selectNav('.j_nav_admin');
 
-            //加载列表
-            $.get($.Iwami.rootUri + '/client/GET/admin.ajax', {
-                adminid: $.Iwami.login.getUserId()
-            }, function(res){
-                if($.Iwami.ajax.validRes(res)){ //验证通过
-                    $('#list').html(baidu.template('listTmpl', res));
-                }
-            }, 'json');
+
+
+            function getUser(){
+                //加载列表
+                $.get($.Iwami.rootUri + '/client/GET/admin.ajax', {
+                    adminid: $.Iwami.login.getUserId(),
+                    key: $postForm.find('input[name="key"]').val()
+                }, function(res){
+                    if($.Iwami.ajax.validRes(res)){ //验证通过
+                        $('#list').html(baidu.template('listTmpl', res));
+                    }
+                }, 'json');
+            }
+            //getUser('');
+
+            var $postForm = $('#postForm');
+            $postForm.submit(function(e){
+                e.preventDefault();
+                getUser();
+            });
+            getUser();
 
             //表格的排序
             $('#list').delegate('.j_btn_move_up, .j_btn_move_down', 'click', function(e){
