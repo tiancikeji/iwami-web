@@ -12,33 +12,6 @@ body {
     bottom: 10px;
     width: 100%;
 }
-.fakeheader, .header {
-    display: none;
-    height: 56px;
-}
-.header {
-    display: none;
-    color: #fff;
-    line-height: 56px;
-    font-family: "microsoft yahei";
-    background: url(../images/header-bg.png) repeat-x;
-    text-align: center;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-}
-.header h1 {
-    font-size: 24px;
-}
-.header .header-back {
-    position: absolute;
-    left: 0;
-    top:0;
-    height: 56px;
-    width: 62px;
-    background: url(../images/header-back.png) no-repeat;
-}
 
 .slide-item {
     width: 100%;
